@@ -47,8 +47,8 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 	// number of rows and columns of big pixels to appear in the grid
 	// eventually these will be set by user input or via a command line
 	// parameter.  That is functionality you need to add for program 02.
-	public static final int BIGPIXEL_ROWS = 60;
-	public static final int BIGPIXEL_COLS = 60;
+	public static int BIGPIXEL_ROWS;
+	public static int BIGPIXEL_COLS;
 	
 	// globals that hold the coordinates of the big pixel that is to be
 	// "turned on"
@@ -60,9 +60,11 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 	public int newcolor = 2;
 	private GLCanvas canvas;
 	
-	public DrawAndHandleInput(GLCanvas c)
+	public DrawAndHandleInput(GLCanvas c, int count)
 	{
 		this.canvas = c;
+		this.BIGPIXEL_ROWS = count;
+		this.BIGPIXEL_COLS = count;
 	}
 	// ====================================================================================
     //

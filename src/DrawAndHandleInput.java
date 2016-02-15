@@ -192,6 +192,27 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 		if(!firstPoint)
 		{
 			drawBigPixel((int)bigpixelxSecond,(int)bigpixelySecond);
+			
+			// draw based on active mode
+			if(activeMode == 1) 
+			{
+				// circular mode
+				drawCircularMode(bigpixelxFirst, bigpixelyFirst, bigpixelxSecond, bigpixelySecond);
+			}
+			else if(activeMode == 2)
+			{
+				// regular line mode
+				drawRegularLine(bigpixelxFirst, bigpixelyFirst, bigpixelxSecond, bigpixelySecond);
+			}
+			else if(activeMode == 3)
+			{
+				// antialiased mode
+				drawAntialiasedLine(bigpixelxFirst, bigpixelyFirst, bigpixelxSecond, bigpixelySecond);
+			}
+			else
+			{
+				System.out.println("No mode of drawing specified.");
+			}
 		}
 
 		/* force any buffered calls to actually be executed */
@@ -204,7 +225,42 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 
 	} // end display
 
-
+	/*
+	 * Method to draw antialised line. 
+	 * The two points passed as parameters are the two ending points
+	 * of the line.
+	 */
+	private void drawAntialiasedLine(double bigpixelxFirst2,
+			double bigpixelyFirst2, double bigpixelxSecond2,
+			double bigpixelySecond2) {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	/*
+	 * Method to implement Bresenham line with the two 
+	 * points given in the parameters
+	 */
+	private void drawRegularLine(double bigpixelxFirst2,
+			double bigpixelyFirst2, double bigpixelxSecond2,
+			double bigpixelySecond2) {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	/*
+	 * Method to draw circle based on two points.
+	 * Takes in first point as the centre of the circle and draw
+	 * the circle such that the distance between the two points is the
+	 * radius.
+	 */
+	private void drawCircularMode(double bigpixelxFirst2,
+			double bigpixelyFirst2, double bigpixelxSecond2,
+			double bigpixelySecond2) {
+		// TODO Auto-generated method stub
+		
+	}
+	
 	/* 
 
 	 method name: drawBigPixel
@@ -303,6 +359,7 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 			bigpixelxSecond = 0;
 			bigpixelySecond = 0;
 			firstPoint = true;
+			activeMode = 0;
 			break;
 		case 'c':
 			System.out.println("Entering circular mode.");

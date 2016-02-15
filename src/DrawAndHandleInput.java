@@ -211,7 +211,7 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 			}
 			else
 			{
-				System.out.println("No mode of drawing specified.");
+				//System.out.println("No mode of drawing specified.");
 			}
 		}
 
@@ -457,7 +457,7 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 		// bigpixely increases from top to bottom starting at 0 and going to
 		// BIGPIXEL_ROWS - 1
 		//
-		if(firstPoint)
+		if(button == MouseEvent.BUTTON1)
 		{
 			System.out.println("Setting coordinates for the first point");
 			bigpixelyFirst = y / (d.getHeight() / BIGPIXEL_ROWS);
@@ -477,7 +477,7 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 				bigpixelyFirst = 0;
 			firstPoint = false;
 		}
-		else
+		else if(button == MouseEvent.BUTTON3)
 		{
 			System.out.println("Setting coordinates for the second point");
 			bigpixelySecond = y / (d.getHeight() / BIGPIXEL_ROWS);

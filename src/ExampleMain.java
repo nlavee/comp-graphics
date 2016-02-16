@@ -65,7 +65,7 @@ public class ExampleMain {
 			Scanner userInput = new Scanner(System.in);
 			try{
 				System.out.println("Value for Red (r): ");
-				r = userInput.nextInt();
+				r = userInput.nextFloat();
 				if(r < 0 || r > 1)
 				{
 					System.out.println("Please enter a value between 0 and 1 for r");
@@ -95,7 +95,7 @@ public class ExampleMain {
 			}
 			catch( InputMismatchException inputError)
 			{
-				System.out.println("Please enter a number for the number of row and column.");
+				System.out.println("Please enter a number for the RGB value.");
 			}
 
 		}

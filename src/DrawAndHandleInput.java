@@ -73,7 +73,7 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 	private float r = 0;
 	private float g = 0;
 	private float b = 0;
-	
+
 	public DrawAndHandleInput(GLCanvas c, int count, float red, float green, float blue)
 	{
 		this.canvas = c;
@@ -196,11 +196,11 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 		// uses the global double variables that were set when user
 		// clicked as the coordinates of the bigpixel to be drawn.
 		drawBigPixel((int)bigpixelxFirst,(int)bigpixelyFirst);
-		
+
 		if(!firstPoint)
 		{
 			drawBigPixel((int)bigpixelxSecond,(int)bigpixelySecond);
-			
+
 			// draw based on active mode
 			if(activeMode == 1) 
 			{
@@ -242,56 +242,98 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 			double bigpixelyFirst2, double bigpixelxSecond2,
 			double bigpixelySecond2) {
 		// TODO Auto-generated method stub
-		
+
 	}
-	
+
 	/*
 	 * Method to implement Bresenham line with the two 
-	 * points given in the parameters. The codes below only works for line with slope |m| < 1.0
+	 * points given in the parameters.
 	 * 
 	 * Credit: Bresenham's Line Algorithm from class note
 	 */
-	private void drawRegularLine(double bigpixelxFirst2,
-			double bigpixelyFirst2, double bigpixelxSecond2,
-			double bigpixelySecond2) {
-		double dx = Math.abs(bigpixelxFirst2 - bigpixelxSecond2);
-		double dy = Math.abs(bigpixelyFirst2 - bigpixelySecond2);
-		
-		double p = 2 * dy - dx;
-		double twoDy = 2 * dy;
-		double twoDyMinusDx = 2 * (dy - dx);
-		double x,y;
-		
-		if( bigpixelxFirst2 > bigpixelxSecond2 )
+	private void drawRegularLine(double x0,
+			double y0, double xEnd,
+			double yEnd) {
+		double dx = Math.abs(xEnd - x0);
+		double dy = Math.abs(yEnd - y0);
+
+		// case where 0.0 < |m| < 1.0
+		if(dy/dx < 1.0)
 		{
-			x = bigpixelxSecond2;
-			y = bigpixelySecond2;
-			bigpixelxSecond2 = bigpixelxFirst2;
-		}
-		else
-		{
-			x = bigpixelxFirst2;
-			y = bigpixelyFirst2;
-		}
-		
-		drawBigPixel((int)x,(int)y);
-		
-		while( x < bigpixelxSecond2 )
-		{
-			x++;
-			if( p < 0 )
+			double p = 2 * dy - dx;
+			double twoDy = 2 * dy;
+			double twoDyMinusDx = 2 * (dy - dx);
+			double x,y;
+
+			// determine which enpoint to use as start position
+			if( x0 > xEnd )
 			{
-				p += twoDy;
+				x = xEnd;
+				y = yEnd;
+				xEnd = x0;
 			}
 			else
 			{
-				y++;
-				p += twoDyMinusDx;
+				x = x0;
+				y = y0;
 			}
+
 			drawBigPixel((int)x,(int)y);
+
+			while( x < xEnd )
+			{
+				x++;
+				if( p < 0 )
+				{
+					p += twoDy;
+				}
+				else
+				{
+					y++;
+					p += twoDyMinusDx;
+				}
+				drawBigPixel((int)x,(int)y);
+			}
+		}
+		// otherwise, |m| > 1.0
+		else
+		{
+			double p = 2 * dx - dy;
+			double twoDx = 2 * dx;
+			double twoDxMinusDy = 2 * (dx - dy);
+			double x,y;
+
+			if( y0 > yEnd )
+			{
+				x = xEnd;
+				y = yEnd;
+				yEnd = y0;
+			}
+			else
+			{
+				x = x0;
+				y = y0;
+			}
+
+			drawBigPixel((int)x,(int)y);
+
+			while( y < yEnd )
+			{
+				y++;
+				if( p < 0 )
+				{
+					p += twoDx;
+				}
+				else
+				{
+					x++;
+					p += twoDxMinusDy;
+				}
+				drawBigPixel((int)x,(int)y);
+			}
 		}
 	}
-	
+
 	/*
 	 * Method to draw circle based on two points.
 	 * Takes in first point as the centre of the circle and draw
@@ -302,9 +344,9 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 			double bigpixelyFirst2, double bigpixelxSecond2,
 			double bigpixelySecond2) {
 		// TODO Auto-generated method stub
-		
+
 	}
-	
+
 	/* 
 
 	 method name: drawBigPixel
@@ -539,7 +581,7 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 				bigpixelxSecond = 0;
 			if (bigpixelySecond < 0)
 				bigpixelySecond = 0;
-			
+
 			System.out.println("Please press r on your keyboard to reset the points.");
 		}
 		//System.out.println("bigpixel x, y  = " + bigpixelx + ", " + bigpixely);

@@ -61,14 +61,14 @@ public class ExampleMain {
 		acceptInput = false;
 		while(!acceptInput)
 		{
-			System.out.println("Please enter a number for rgb between 0 and 1");
+			System.out.println("Please enter a number for rgb between 0 and 1.\n(If you enter wrongly, you will have to enter all three values again)");
 			Scanner userInput = new Scanner(System.in);
 			try{
 				System.out.println("Value for Red (r): ");
 				r = userInput.nextFloat();
 				if(r < 0 || r > 1)
 				{
-					System.out.println("Please enter a value between 0 and 1 for r");
+					System.out.println("Please enter a value between 0 and 1 for r.");
 				}
 				else
 				{
@@ -76,7 +76,7 @@ public class ExampleMain {
 					g = userInput.nextFloat();
 					if(g < 0 || g > 1)
 					{
-						System.out.println("Please enter a value between 0 and 1 for g");
+						System.out.println("Please enter a value between 0 and 1 for g.");
 					}
 					else
 					{
@@ -84,10 +84,11 @@ public class ExampleMain {
 						b = userInput.nextFloat();
 						if(b < 0 || b > 1)
 						{
-							System.out.println("Please enter a value between 0 and 1 for b");
+							System.out.println("Please enter a value between 0 and 1 for b.");
 						}
 						else
 						{
+							System.out.println("You have entered the following for RGB: " + r + ", " + g + ", " + b);
 							acceptInput = true;
 						}
 					}
@@ -95,7 +96,7 @@ public class ExampleMain {
 			}
 			catch( InputMismatchException inputError)
 			{
-				System.out.println("Please enter a number for the RGB value.");
+				System.out.println("Please enter a number for the rgb values.");
 			}
 
 		}

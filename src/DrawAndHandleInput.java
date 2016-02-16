@@ -282,17 +282,34 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 
 			while( x < xEnd )
 			{
-				x++;
-				if( p < 0 )
+				if(y0 > yEnd)
 				{
-					p += twoDy;
+					x++;
+					if( p < 0 )
+					{
+						p += twoDy;
+					}
+					else
+					{
+						y++;
+						p += twoDyMinusDx;
+					}
+					drawBigPixel((int)x,(int)y);
 				}
 				else
 				{
-					y++;
-					p += twoDyMinusDx;
+					x++;
+					if( p < 0 )
+					{
+						p += twoDy;
+					}
+					else
+					{
+						y--;
+						p += twoDyMinusDx;
+					}
+					drawBigPixel((int)x,(int)y);
 				}
-				drawBigPixel((int)x,(int)y);
 			}
 		}
 		// otherwise, |m| > 1.0
@@ -319,17 +336,34 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 
 			while( y < yEnd )
 			{
-				y++;
-				if( p < 0 )
+				if( x0 > xEnd )
 				{
-					p += twoDx;
+					y++;
+					if( p < 0 )
+					{
+						p += twoDx;
+					}
+					else
+					{
+						x++;
+						p += twoDxMinusDy;
+					}
+					drawBigPixel((int)x,(int)y);
 				}
 				else
 				{
-					x++;
-					p += twoDxMinusDy;
+					y++;
+					if( p < 0 )
+					{
+						p += twoDx;
+					}
+					else
+					{
+						x--;
+						p += twoDxMinusDy;
+					}
+					drawBigPixel((int)x,(int)y);
 				}
-				drawBigPixel((int)x,(int)y);
 			}
 		}
 	}

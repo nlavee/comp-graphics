@@ -247,13 +247,49 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 	
 	/*
 	 * Method to implement Bresenham line with the two 
-	 * points given in the parameters
+	 * points given in the parameters. The codes below only works for line with slope |m| < 1.0
+	 * 
+	 * Credit: Bresenham's Line Algorithm from class note
 	 */
 	private void drawRegularLine(double bigpixelxFirst2,
 			double bigpixelyFirst2, double bigpixelxSecond2,
 			double bigpixelySecond2) {
-		// TODO Auto-generated method stub
+		double dx = Math.abs(bigpixelxFirst2 - bigpixelxSecond2);
+		double dy = Math.abs(bigpixelyFirst2 - bigpixelySecond2);
 		
+		double p = 2 * dy - dx;
+		double twoDy = 2 * dy;
+		double twoDyMinusDx = 2 * (dy - dx);
+		double x,y;
+		
+		if( bigpixelxFirst2 > bigpixelxSecond2 )
+		{
+			x = bigpixelxSecond2;
+			y = bigpixelySecond2;
+			bigpixelxSecond2 = bigpixelxFirst2;
+		}
+		else
+		{
+			x = bigpixelxFirst2;
+			y = bigpixelyFirst2;
+		}
+		
+		drawBigPixel((int)x,(int)y);
+		
+		while( x < bigpixelxSecond2 )
+		{
+			x++;
+			if( p < 0 )
+			{
+				p += twoDy;
+			}
+			else
+			{
+				y++;
+				p += twoDyMinusDx;
+			}
+			drawBigPixel((int)x,(int)y);
+		}
 	}
 	
 	/*

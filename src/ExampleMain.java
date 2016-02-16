@@ -55,7 +55,50 @@ public class ExampleMain {
 			}
 		}
 
+		float r = 0;
+		float g = 0;
+		float b = 0;
+		acceptInput = false;
+		while(!acceptInput)
+		{
+			System.out.println("Please enter a number for rgb between 0 and 1");
+			Scanner userInput = new Scanner(System.in);
+			try{
+				System.out.println("Value for Red (r): ");
+				r = userInput.nextInt();
+				if(r < 0 || r > 1)
+				{
+					System.out.println("Please enter a value between 0 and 1 for r");
+				}
+				else
+				{
+					System.out.println("Value for Green (g): ");
+					g = userInput.nextFloat();
+					if(g < 0 || g > 1)
+					{
+						System.out.println("Please enter a value between 0 and 1 for g");
+					}
+					else
+					{
+						System.out.println("Value for Blue (b): ");
+						b = userInput.nextFloat();
+						if(b < 0 || b > 1)
+						{
+							System.out.println("Please enter a value between 0 and 1 for b");
+						}
+						else
+						{
+							acceptInput = true;
+						}
+					}
+				}
+			}
+			catch( InputMismatchException inputError)
+			{
+				System.out.println("Please enter a number for the number of row and column.");
+			}
 
+		}
 		/* Create the Frame */
 		testFrame = new Frame("TestFrame");
 
@@ -103,7 +146,7 @@ public class ExampleMain {
 		// create an instance of the Class that listens to all events
 		// (GLEvents, Keyboard, and Mouse events)
 		// add this object as all these listeners to the canvas 
-		dahi = new DrawAndHandleInput(canvas, numRowCol);
+		dahi = new DrawAndHandleInput(canvas, numRowCol, r, g, b);
 		canvas.addGLEventListener(dahi);
 		canvas.addKeyListener(dahi);
 		canvas.addMouseListener(dahi);

@@ -69,11 +69,19 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 	// globals to know whether we're dealing with first or second point
 	public boolean firstPoint = true;
 
-	public DrawAndHandleInput(GLCanvas c, int count)
+	// globals for color of the chosen big pixel
+	private float r = 0;
+	private float g = 0;
+	private float b = 0;
+	
+	public DrawAndHandleInput(GLCanvas c, int count, float red, float green, float blue)
 	{
 		this.canvas = c;
 		this.BIGPIXEL_ROWS = count;
 		this.BIGPIXEL_COLS = count;
+		this.r = red;
+		this.g = green;
+		this.b = blue;
 	}
 	// ====================================================================================
 	//
@@ -284,7 +292,7 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 		// of the big pixel if the big pixel coordinates' y values
 		// increased as we go up
 		int flip_y = Math.abs((BIGPIXEL_ROWS-1) - y);
-		gl.glColor3d(1.0, 0, 0);
+		gl.glColor3d(r, g, b);
 		gl.glBegin(GL2.GL_POLYGON);
 		gl.glVertex2d((double)x*BIGAREA_HEIGHT/BIGPIXEL_ROWS, 
 				(double)flip_y*BIGAREA_WIDTH/BIGPIXEL_COLS);

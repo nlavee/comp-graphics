@@ -1,14 +1,15 @@
+# Computer Graphics 
 This is part of my work with Computer Graphics using JOGL in Java. 
 
 This project contains base code from instructor that I built up from to achieve certain tasks. For example, implementing Bresenham Line and Circle Algorithm. The project will continue to grow as I learn more techniques and algorithms.
 
 Checklist for algorithms implemented:
 
-* Bresenham's Line Algorithm (Works with any pair of points).
+* **Bresenham's Line Algorithm** (*Works with any pair of points*).
 e.g.:  
 ![Line Drawing Algorithm](img/BrensenhamLineAlgorithmExample.png)
-* Circle Drawing Algorithm.
-e.g.  
+* **Circle Drawing Algorithm**
+e.g.:  
 ![Circle Drawing Algorithm](img/CircleDrawingAlgorithmExample.png)
 * 
 

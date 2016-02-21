@@ -258,7 +258,7 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 		double dy = Math.abs(yEnd - y0);
 		double delX = xEnd - x0;
 		double delY = yEnd - y0;
-		
+
 		// case where 0.0 < |m| < 1.0
 		if(dy < dx)
 		{
@@ -289,15 +289,8 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 				if( p < 0 ) p += twoDy;
 				else
 				{
-					if( delY > 0 ) 
-					{
-						y++;
-						System.out.println("dy > 0");
-					}
-					else {
-						y--;
-						System.out.println("dy < 0");
-					}
+					if( delY > 0 ) y++;
+					else y--;
 					p += twoDyMinusDx;
 				}
 				drawBigPixel(Math.round((float)x),Math.round((float)y));
@@ -332,15 +325,8 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 				if( p < 0 ) p += twoDx;
 				else
 				{
-					if( delX > 0 ) {
-						x++;
-						System.out.println("dx > 0");
-					}
-					else {
-						x--;
-						System.out.println("dx < 0");
-					}
-					//					x++;
+					if( delX > 0 ) x++;
+					else x--;
 					p += twoDxMinusDy;
 				}
 				drawBigPixel(Math.round((float)x),Math.round((float)y));
@@ -354,13 +340,32 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 	 * the circle such that the distance between the two points is the
 	 * radius.
 	 */
-	private void drawCircularMode(double bigpixelxFirst2,
-			double bigpixelyFirst2, double bigpixelxSecond2,
-			double bigpixelySecond2) {
-		// TODO Auto-generated method stub
+	private void drawCircularMode(double x0,
+			double y0, double xEnd,
+			double yEnd) {
 
+		// calculate radius
+		double radius = calculateDistance(x0,y0,xEnd,yEnd);
+		
+		// draw circle at origin
+		// only need to draw a quarter of the circle
+		// The eight points are: 
+		// (-x,-y), (-x,y), (x,-y), (x,y), (y,x), (y,-x), (-y,x), (-y,-x)
+		
+		
+		// translate to have circle's center at (x0, y0)
+		
+		
 	}
 
+	/*
+	 * Method to calculate the distance between two points 
+	 * using Pythagoras' theorem.
+	 */
+	private double calculateDistance(double x0, double y0, double xEnd,
+			double yEnd) {
+		return Math.sqrt( Math.pow( yEnd - y0, 2 ) + Math.pow( xEnd - x0, 2 ) );
+	}
 	/* 
 
 	 method name: drawBigPixel

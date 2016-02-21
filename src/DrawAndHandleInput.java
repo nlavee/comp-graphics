@@ -346,16 +346,49 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 
 		// calculate radius
 		double radius = calculateDistance(x0,y0,xEnd,yEnd);
-		
+
 		// draw circle at origin
 		// only need to draw a quarter of the circle
 		// The eight points are: 
 		// (-x,-y), (-x,y), (x,-y), (x,y), (y,x), (y,-x), (-y,x), (-y,-x)
 		
+		double pK = 1- radius;
 		
-		// translate to have circle's center at (x0, y0)
+		double x = 0;
+		double y = radius;
 		
+		//drawBigPixel( (int) xEnd, (int) yEnd);
 		
+		while(x < radius && y > 0 && 
+				( (int)(x+x0) != (int)(y+x0)) && ( (int)(x+x0) != (int)(-1*y+x0)) &&
+				( (int)(-1*x+x0) != (int)(y+x0)) && ( (int)(-1*x+x0) != (int)(-1*y+x0)) &&
+				( (int)(y+y0) != (int)(x+y0)) && ( (int)(y+y0) != (int)(-1*x+y0)) &&
+				( (int)(-1*y+y0) != (int)(x+y0)) && ( (int)(-1*y+y0) != (int)(-1*x+y0)))
+		{
+			x = x + 1;
+			if( pK < 0 )
+			{
+				pK = pK + 2 * (x) + 1;
+			}
+			else
+			{
+				pK = pK + 2 * (x) +1 - 2 * (y + 1);
+				y = y - 1;
+			}
+			
+			// draw 8 points
+			double negX = -1 * x;
+			double negY = -1 * y;
+			drawBigPixel( (int) (x + x0), (int) (y + y0) );
+			drawBigPixel( (int) (negX + x0), (int) (negY + y0) );
+			drawBigPixel( (int) (negX + x0), (int) (y + y0) );
+			drawBigPixel( (int) (x + x0), (int) (negY + y0));
+			drawBigPixel( (int) (y + x0), (int) (x + y0));
+			drawBigPixel( (int) (y + x0), (int) (negX + y0));
+			drawBigPixel( (int) (negY + x0), (int) (x + y0));
+			drawBigPixel( (int) (negY + x0), (int) (negX + y0));
+		}
+
 	}
 
 	/*

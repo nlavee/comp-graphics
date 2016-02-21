@@ -5,7 +5,7 @@ This project contains base code from instructor that I built up from to achieve 
 Checklist for algorithms implemented:
 
 * Bresenham's Line Algorithm (Works with any pair of points).
-![Line Drawing Algorithm](img/BresenhamLineAlgorithmExample.png)
+![Line Drawing Algorithm](img/BrensenhamLineAlgorithmExample.png)
 * Circle Drawing Algorithm.
 ![Circle Drawing Algorithm](img/CircleDrawingAlgorithmExample.png)
 * 

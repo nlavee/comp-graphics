@@ -64,7 +64,7 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 	private GLCanvas canvas;
 
 	// globals on what mode we're in
-	public int activeMode = 0;
+	public int activeMode = 2;
 
 	// globals to know whether we're dealing with first or second point
 	public boolean firstPoint = true;

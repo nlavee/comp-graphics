@@ -256,9 +256,11 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 			double yEnd) {
 		double dx = Math.abs(xEnd - x0);
 		double dy = Math.abs(yEnd - y0);
-
+		double delX = xEnd - x0;
+		double delY = yEnd - y0;
+		
 		// case where 0.0 < |m| < 1.0
-		if(dy/dx < 1.0)
+		if(dy < dx)
 		{
 			double p = 2 * dy - dx;
 			double twoDy = 2 * dy;
@@ -271,6 +273,7 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 				x = xEnd;
 				y = yEnd;
 				xEnd = x0;
+				delY = -1 * delY;
 			}
 			else
 			{
@@ -278,38 +281,26 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 				y = y0;
 			}
 
-			drawBigPixel((int)x,(int)y);
+			drawBigPixel(Math.round((float)x),Math.round((float)y));
 
 			while( x < xEnd )
 			{
-				if(y0 > yEnd)
-				{
-					x++;
-					if( p < 0 )
-					{
-						p += twoDy;
-					}
-					else
-					{
-						y++;
-						p += twoDyMinusDx;
-					}
-					drawBigPixel((int)x,(int)y);
-				}
+				x++;
+				if( p < 0 ) p += twoDy;
 				else
 				{
-					x++;
-					if( p < 0 )
+					if( delY > 0 ) 
 					{
-						p += twoDy;
+						y++;
+						System.out.println("dy > 0");
 					}
-					else
-					{
+					else {
 						y--;
-						p += twoDyMinusDx;
+						System.out.println("dy < 0");
 					}
-					drawBigPixel((int)x,(int)y);
+					p += twoDyMinusDx;
 				}
+				drawBigPixel(Math.round((float)x),Math.round((float)y));
 			}
 		}
 		// otherwise, |m| > 1.0
@@ -325,6 +316,7 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 				x = xEnd;
 				y = yEnd;
 				yEnd = y0;
+				delX = -1 * delX;
 			}
 			else
 			{
@@ -332,38 +324,26 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 				y = y0;
 			}
 
-			drawBigPixel((int)x,(int)y);
+			drawBigPixel(Math.round((float)x),Math.round((float)y));
 
 			while( y < yEnd )
 			{
-				if( x0 > xEnd )
-				{
-					y++;
-					if( p < 0 )
-					{
-						p += twoDx;
-					}
-					else
-					{
-						x++;
-						p += twoDxMinusDy;
-					}
-					drawBigPixel((int)x,(int)y);
-				}
+				y++;
+				if( p < 0 ) p += twoDx;
 				else
 				{
-					y++;
-					if( p < 0 )
-					{
-						p += twoDx;
+					if( delX > 0 ) {
+						x++;
+						System.out.println("dx > 0");
 					}
-					else
-					{
+					else {
 						x--;
-						p += twoDxMinusDy;
+						System.out.println("dx < 0");
 					}
-					drawBigPixel((int)x,(int)y);
+					//					x++;
+					p += twoDxMinusDy;
 				}
+				drawBigPixel(Math.round((float)x),Math.round((float)y));
 			}
 		}
 	}

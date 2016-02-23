@@ -40,6 +40,10 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 	public static  final int MAX_X =250;
 	public static  final int MAX_Y =200;
 
+	/* define the intensity limits */
+	public static final double MAX_INTENSITY = 1.0;
+	public static final double MIN_INTENSITY = 0.0;
+
 	// height and width of the bigpixel area in world coordinate measurements
 	public static final int BIGAREA_HEIGHT = 200;
 	public static final int BIGAREA_WIDTH = 200;
@@ -195,11 +199,11 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 
 		// uses the global double variables that were set when user
 		// clicked as the coordinates of the bigpixel to be drawn.
-		drawBigPixel((int)bigpixelxFirst,(int)bigpixelyFirst);
+		drawBigPixel((int)bigpixelxFirst,(int)bigpixelyFirst, MAX_INTENSITY);
 
 		if(!firstPoint)
 		{
-			drawBigPixel((int)bigpixelxSecond,(int)bigpixelySecond);
+			drawBigPixel((int)bigpixelxSecond,(int)bigpixelySecond, MAX_INTENSITY);
 
 			// draw based on active mode
 			if(activeMode == 1) 
@@ -238,10 +242,9 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 	 * The two points passed as parameters are the two ending points
 	 * of the line.
 	 */
-	private void drawAntialiasedLine(double bigpixelxFirst2,
-			double bigpixelyFirst2, double bigpixelxSecond2,
-			double bigpixelySecond2) {
-		// TODO Auto-generated method stub
+	private void drawAntialiasedLine(double x0,
+			double y0, double xEnd,
+			double yEnd) {
 
 	}
 
@@ -281,7 +284,7 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 				y = y0;
 			}
 
-			drawBigPixel(Math.round((float)x),Math.round((float)y));
+			drawBigPixel(Math.round((float)x),Math.round((float)y), MAX_INTENSITY);
 
 			while( x < xEnd )
 			{
@@ -293,7 +296,7 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 					else y--;
 					p += twoDyMinusDx;
 				}
-				drawBigPixel(Math.round((float)x),Math.round((float)y));
+				drawBigPixel(Math.round((float)x),Math.round((float)y), MAX_INTENSITY);
 			}
 		}
 		// otherwise, |m| > 1.0
@@ -317,7 +320,7 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 				y = y0;
 			}
 
-			drawBigPixel(Math.round((float)x),Math.round((float)y));
+			drawBigPixel(Math.round((float)x),Math.round((float)y), MAX_INTENSITY);
 
 			while( y < yEnd )
 			{
@@ -329,7 +332,7 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 					else x--;
 					p += twoDxMinusDy;
 				}
-				drawBigPixel(Math.round((float)x),Math.round((float)y));
+				drawBigPixel(Math.round((float)x),Math.round((float)y), MAX_INTENSITY);
 			}
 		}
 	}
@@ -351,19 +354,15 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 		// only need to draw a quarter of the circle
 		// The eight points are: 
 		// (-x,-y), (-x,y), (x,-y), (x,y), (y,x), (y,-x), (-y,x), (-y,-x)
-		
+
 		double pK = 1- radius;
-		
+
 		double x = 0;
 		double y = radius;
-		
-		//drawBigPixel( (int) xEnd, (int) yEnd);
-		
-		while(x < radius && y > 0 && 
-				( (int)(x+x0) != (int)(y+x0)) && ( (int)(x+x0) != (int)(-1*y+x0)) &&
-				( (int)(-1*x+x0) != (int)(y+x0)) && ( (int)(-1*x+x0) != (int)(-1*y+x0)) &&
-				( (int)(y+y0) != (int)(x+y0)) && ( (int)(y+y0) != (int)(-1*x+y0)) &&
-				( (int)(-1*y+y0) != (int)(x+y0)) && ( (int)(-1*y+y0) != (int)(-1*x+y0)))
+
+//		drawBigPixel( (int) xEnd, (int) yEnd, MAX_INTENSITY);
+
+		while(x <= y )		
 		{
 			x = x + 1;
 			if( pK < 0 )
@@ -375,18 +374,20 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 				pK = pK + 2 * (x) +1 - 2 * (y + 1);
 				y = y - 1;
 			}
-			
+
 			// draw 8 points
 			double negX = -1 * x;
 			double negY = -1 * y;
-			drawBigPixel( (int) (x + x0), (int) (y + y0) );
-			drawBigPixel( (int) (negX + x0), (int) (negY + y0) );
-			drawBigPixel( (int) (negX + x0), (int) (y + y0) );
-			drawBigPixel( (int) (x + x0), (int) (negY + y0));
-			drawBigPixel( (int) (y + x0), (int) (x + y0));
-			drawBigPixel( (int) (y + x0), (int) (negX + y0));
-			drawBigPixel( (int) (negY + x0), (int) (x + y0));
-			drawBigPixel( (int) (negY + x0), (int) (negX + y0));
+
+			// check to not draw out of the big rectangle bound
+			if( x + x0 < BIGAREA_WIDTH && x + x0 > 0  && y + y0 > 0 && y + y0 < BIGAREA_HEIGHT)	drawBigPixel( (int) (x + x0), (int) (y + y0), MAX_INTENSITY );
+			if( negX + x0 < BIGAREA_WIDTH && negX + x0 > 0  && negY + y0 > 0 && negY + y0 < BIGAREA_HEIGHT) drawBigPixel( (int) (negX + x0), (int) (negY + y0), MAX_INTENSITY );
+			if( negX + x0 < BIGAREA_WIDTH && negX + x0 > 0  && y + y0 > 0 && y + y0 < BIGAREA_HEIGHT) drawBigPixel( (int) (negX + x0), (int) (y + y0), MAX_INTENSITY );
+			if( x + x0 < BIGAREA_WIDTH && x + x0 > 0  && negY + y0 > 0 && negY + y0 < BIGAREA_HEIGHT) drawBigPixel( (int) (x + x0), (int) (negY + y0), MAX_INTENSITY );
+			if( y + x0 < BIGAREA_WIDTH && y + x0 > 0  && x + y0 > 0 && x + y0 < BIGAREA_HEIGHT) drawBigPixel( (int) (y + x0), (int) (x + y0), MAX_INTENSITY );
+			if( y + x0 < BIGAREA_WIDTH && y + x0 > 0  && negX + y0 > 0 && negX + y0 < BIGAREA_HEIGHT) drawBigPixel( (int) (y + x0), (int) (negX + y0), MAX_INTENSITY );
+			if( negY + x0 < BIGAREA_WIDTH && negY + x0 > 0  && x + y0 > 0 && x + y0 < BIGAREA_HEIGHT) drawBigPixel( (int) (negY + x0), (int) (x + y0), MAX_INTENSITY );
+			if( negY + x0 < BIGAREA_WIDTH && negY + x0 > 0  && negX + y0 > 0 && negX + y0 < BIGAREA_HEIGHT) drawBigPixel( (int) (negY + x0), (int) (negX + y0), MAX_INTENSITY );
 		}
 
 	}
@@ -414,7 +415,7 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 	    y - the y coordinate of the big pixel
 
 	 */
-	public void drawBigPixel(int x, int y)
+	public void drawBigPixel(int x, int y, double i)
 	{
 		// because the y screen coordinates increase as we go down 
 		// and the y world coordinates increase as we go up
@@ -422,7 +423,7 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 		// of the big pixel if the big pixel coordinates' y values
 		// increased as we go up
 		int flip_y = Math.abs((BIGPIXEL_ROWS-1) - y);
-		gl.glColor3d(r, g, b);
+		gl.glColor3d(r * i, g * i, b * i);
 		gl.glBegin(GL2.GL_POLYGON);
 		gl.glVertex2d((double)x*BIGAREA_HEIGHT/BIGPIXEL_ROWS, 
 				(double)flip_y*BIGAREA_WIDTH/BIGPIXEL_COLS);

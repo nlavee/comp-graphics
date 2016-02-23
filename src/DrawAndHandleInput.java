@@ -257,34 +257,34 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 	private void drawRegularLine(double x0,
 			double y0, double xEnd,
 			double yEnd) {
-		double dx = Math.abs(xEnd - x0);
-		double dy = Math.abs(yEnd - y0);
-		double delX = xEnd - x0;
-		double delY = yEnd - y0;
+		int dx = (int) Math.abs(xEnd - x0);
+		int dy = (int) Math.abs(yEnd - y0);
+		int delX = (int) (xEnd - x0);
+		int delY = (int) (yEnd - y0);
 
 		// case where 0.0 < |m| < 1.0
 		if(dy < dx)
 		{
-			double p = 2 * dy - dx;
-			double twoDy = 2 * dy;
-			double twoDyMinusDx = 2 * (dy - dx);
-			double x,y;
+			int p = 2 * dy - dx;
+			int twoDy = 2 * dy;
+			int twoDyMinusDx = 2 * (dy - dx);
+			int x,y;
 
 			// determine which enpoint to use as start position
 			if( x0 > xEnd )
 			{
-				x = xEnd;
-				y = yEnd;
+				x = (int) xEnd;
+				y = (int) yEnd;
 				xEnd = x0;
 				delY = -1 * delY;
 			}
 			else
 			{
-				x = x0;
-				y = y0;
+				x = (int) x0;
+				y = (int) y0;
 			}
 
-			drawBigPixel(Math.round((float)x),Math.round((float)y), MAX_INTENSITY);
+			drawBigPixel(x,y, MAX_INTENSITY);
 
 			while( x < xEnd )
 			{
@@ -296,31 +296,31 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 					else y--;
 					p += twoDyMinusDx;
 				}
-				drawBigPixel(Math.round((float)x),Math.round((float)y), MAX_INTENSITY);
+				drawBigPixel(x,y, MAX_INTENSITY);
 			}
 		}
 		// otherwise, |m| > 1.0
 		else
 		{
-			double p = 2 * dx - dy;
-			double twoDx = 2 * dx;
-			double twoDxMinusDy = 2 * (dx - dy);
-			double x,y;
+			int p = 2 * dx - dy;
+			int twoDx = 2 * dx;
+			int twoDxMinusDy = 2 * (dx - dy);
+			int x,y;
 
 			if( y0 > yEnd )
 			{
-				x = xEnd;
-				y = yEnd;
+				x = (int) xEnd;
+				y = (int) yEnd;
 				yEnd = y0;
 				delX = -1 * delX;
 			}
 			else
 			{
-				x = x0;
-				y = y0;
+				x = (int) x0;
+				y = (int) y0;
 			}
 
-			drawBigPixel(Math.round((float)x),Math.round((float)y), MAX_INTENSITY);
+			drawBigPixel(x,y, MAX_INTENSITY);
 
 			while( y < yEnd )
 			{
@@ -332,7 +332,7 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 					else x--;
 					p += twoDxMinusDy;
 				}
-				drawBigPixel(Math.round((float)x),Math.round((float)y), MAX_INTENSITY);
+				drawBigPixel(x,y, MAX_INTENSITY);
 			}
 		}
 	}
@@ -348,19 +348,17 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 			double yEnd) {
 
 		// calculate radius
-		double radius = calculateDistance(x0,y0,xEnd,yEnd);
+		int radius = calculateDistance(x0,y0,xEnd,yEnd);
 
 		// draw circle at origin
 		// only need to draw a quarter of the circle
 		// The eight points are: 
 		// (-x,-y), (-x,y), (x,-y), (x,y), (y,x), (y,-x), (-y,x), (-y,-x)
 
-		double pK = 1- radius;
+		int pK = (int) (1 - radius);
 
-		double x = 0;
-		double y = radius;
-
-//		drawBigPixel( (int) xEnd, (int) yEnd, MAX_INTENSITY);
+		int x = -1;
+		int y = radius;
 
 		while(x <= y )		
 		{
@@ -376,8 +374,8 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 			}
 
 			// draw 8 points
-			double negX = -1 * x;
-			double negY = -1 * y;
+			int negX = -1 * x;
+			int negY = -1 * y;
 
 			// check to not draw out of the big rectangle bound
 			if( x + x0 < BIGAREA_WIDTH && x + x0 > 0  && y + y0 > 0 && y + y0 < BIGAREA_HEIGHT)	drawBigPixel( (int) (x + x0), (int) (y + y0), MAX_INTENSITY );
@@ -396,9 +394,9 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 	 * Method to calculate the distance between two points 
 	 * using Pythagoras' theorem.
 	 */
-	private double calculateDistance(double x0, double y0, double xEnd,
+	private int calculateDistance(double x0, double y0, double xEnd,
 			double yEnd) {
-		return Math.sqrt( Math.pow( yEnd - y0, 2 ) + Math.pow( xEnd - x0, 2 ) );
+		return (int) Math.sqrt( Math.pow( yEnd - y0, 2 ) + Math.pow( xEnd - x0, 2 ) );
 	}
 	/* 
 

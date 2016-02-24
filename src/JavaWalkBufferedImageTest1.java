@@ -1,3 +1,19 @@
+/**
+ * This code is adapted from: 
+ * http://alvinalexander.com/blog/post/java/getting-rgb-values-for-each-pixel-in-image-using-java-bufferedi
+ * in order to get pixel out of image.
+ * 
+ * Summary: 
+ * 		The code walks through the image, walking through the pixels
+ * 		and for each pixel, record the rgb values down.
+ * 		It saves information into a text file where the first line is the width and height
+ * 		of the image. Each other line is a pixel with the first two values being 
+ * 		x, y values, followed by rgb. I reduced the amount of info we save by not saving data for those 
+ * 		pixel with rgb values of (0, 0, 0). 
+ * @author AnhVuNguyen
+ *
+ */
+
 import java.awt.Component;
 import java.awt.image.BufferedImage;
 import java.io.BufferedWriter;
@@ -8,13 +24,6 @@ import java.net.URL;
 
 import javax.imageio.ImageIO;
 
-/**
- * This code is adapted from: http://alvinalexander.com/blog/post/java/getting-rgb-values-for-each-pixel-in-image-using-java-bufferedi
- * in order to get pixel out of image.
- * The
- * @author AnhVuNguyen
- *
- */
 public class JavaWalkBufferedImageTest1 extends Component {
 	
 	public static void main(String[] foo) {

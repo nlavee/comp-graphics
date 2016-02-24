@@ -261,95 +261,7 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 	private void drawAntialiasedLine(double x0,
 			double y0, double xEnd,
 			double yEnd) {
-		int dx = (int) Math.abs(xEnd - x0);
-		int dy = (int) Math.abs(yEnd - y0);
-		int delX = (int) (xEnd - x0);
-		int delY = (int) (yEnd - y0);
-
-		// case where 0.0 < |m| < 1.0
-		if(dy < dx)
-		{
-			int p = 2 * dy - dx;
-			int twoDy = 2 * dy;
-			int twoDyMinusDx = 2 * (dy - dx);
-			int x,y;
-
-			// determine which enpoint to use as start position
-			if( x0 > xEnd )
-			{
-				x = (int) xEnd;
-				y = (int) yEnd;
-				xEnd = x0;
-				delY = -1 * delY;
-			}
-			else
-			{
-				x = (int) x0;
-				y = (int) y0;
-			}
-
-			drawBigPixel(x,y, MAX_INTENSITY);
-
-			int dLower = 0;
-			int dUpper = 0;
-			while( x < xEnd )
-			{
-				x++;
-				dLower = (p * dy + 1) /2 ;
-
-				if( p < 0 ) 
-				{
-					p += twoDy;
-					drawBigPixel(x, y, 1-dLower);
-					drawBigPixel(x, y+1, dLower);
-				}
-				else
-				{
-					if( delY > 0 ) y++;
-					else y--;
-					p += twoDyMinusDx;
-					drawBigPixel(x, y, 1-dLower);
-					drawBigPixel(x, y+1, dLower);
-				}
-
-			}
-		}
-		// otherwise, |m| > 1.0
-		else
-		{
-			int p = 2 * dx - dy;
-			int twoDx = 2 * dx;
-			int twoDxMinusDy = 2 * (dx - dy);
-			int x,y;
-
-			if( y0 > yEnd )
-			{
-				x = (int) xEnd;
-				y = (int) yEnd;
-				yEnd = y0;
-				delX = -1 * delX;
-			}
-			else
-			{
-				x = (int) x0;
-				y = (int) y0;
-			}
-
-			drawBigPixel(x,y, MAX_INTENSITY);
-
-			while( y < yEnd )
-			{
-				y++;
-				if( p < 0 ) p += twoDx;
-				else
-				{
-					if( delX > 0 ) x++;
-					else x--;
-					p += twoDxMinusDy;
-				}
-				drawBigPixel(x,y, MAX_INTENSITY);
-			}
-		}
+		
 	}
 
 	/*
@@ -576,10 +488,10 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 				line = br.readLine();
 			}
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
+			System.err.println(e);
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			System.err.println(e);
 			e.printStackTrace();
 		}
 	}
@@ -597,6 +509,7 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 	 parameters:
 	    x - the x coordinate of the big pixel
 	    y - the y coordinate of the big pixel
+	    i - the value to times rgb value by
 
 	 */
 	public void drawBigPixel(int x, int y, double i)
@@ -621,6 +534,24 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 
 	}
 
+	/* 
+
+	 method name: drawBigPixel
+
+	    takes in "big pixel" coordinates and displays the "big pixel" (polygon)
+	    associated with those coordinates.
+	    Note: the "big pixel" area is situated so that
+	       0, 0 is the highest-leftmost big pixel and
+	       BIXPIXEL_COLS - 1, BIGPIXELROWS - 1 is the lowest-rightmost big pixel
+
+	 parameters:
+	    x - the x coordinate of the big pixel
+	    y - the y coordinate of the big pixel
+	    red - value for red in RGB
+	    green - value for green in RGB
+	    blue - value for blue in RGB
+
+	 */
 	public void drawBigPixel(int x, int y, double red, double green, double blue)
 	{
 		// because the y screen coordinates increase as we go down 

@@ -9,7 +9,12 @@
   This class contains the main method and draws a window and creates an object of 
   DrawAndHandleInput which in a GLEventListener as well as a KeyListener and MouseListener.
 
-
+  UPDATE:
+  
+  Author: Anh Vu Nguyen
+  Updated to ask for input from users and sanitize the inputs for the program to allow
+  certain degree of customization.
+  
  */
 import java.awt.Frame;
 import java.awt.event.*;

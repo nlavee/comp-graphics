@@ -19,11 +19,17 @@ I took some images online, ran it through a script I adapted from the Internet i
 e.g.:
 	* Pikachu (original & generated)
 ![Pikachu](img/pikachu.png)
+  
 ![Pikachu Generated](img/pikachuGenerated.png)
+  
 ![Mario](img/mario.png)
+  
 ![Mario Generated](img/marioGenerated.png)
+  
 ![Link](img/link.png)
+  
 ![Link Generated](img/linkGenerated.png)
+  
 
 I can be contacted at [vu.nguyen@skidmore.edu](mailto:vu.nguyen@skidmore.edu) or [anhvu.nguyenlam@gmail.com](mailto:anhvu.nguyenlam@gmail.com).
 

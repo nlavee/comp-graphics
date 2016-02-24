@@ -17,6 +17,10 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.geom.Dimension2D;
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 
 import com.jogamp.opengl.DebugGL2;
 import com.jogamp.opengl.GL2;
@@ -51,8 +55,8 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 	// number of rows and columns of big pixels to appear in the grid
 	// eventually these will be set by user input or via a command line
 	// parameter.  That is functionality you need to add for program 02.
-	public static int BIGPIXEL_ROWS;
-	public static int BIGPIXEL_COLS;
+	public static int BIGPIXEL_ROWS = 1;
+	public static int BIGPIXEL_COLS = 1;
 
 	// globals that hold the coordinates of the big pixel that is to be
 	// "turned on"
@@ -221,6 +225,18 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 				// antialiased mode
 				drawAntialiasedLine(bigpixelxFirst, bigpixelyFirst, bigpixelxSecond, bigpixelySecond);
 			}
+			else if(activeMode == 4)
+			{
+				drawPixelArt(1);
+			}
+			else if(activeMode == 5)
+			{
+				drawPixelArt(2);
+			}
+			else if(activeMode == 6)
+			{
+				drawPixelArt(3);
+			}
 			else
 			{
 				//System.out.println("No mode of drawing specified.");
@@ -245,7 +261,95 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 	private void drawAntialiasedLine(double x0,
 			double y0, double xEnd,
 			double yEnd) {
+		int dx = (int) Math.abs(xEnd - x0);
+		int dy = (int) Math.abs(yEnd - y0);
+		int delX = (int) (xEnd - x0);
+		int delY = (int) (yEnd - y0);
 
+		// case where 0.0 < |m| < 1.0
+		if(dy < dx)
+		{
+			int p = 2 * dy - dx;
+			int twoDy = 2 * dy;
+			int twoDyMinusDx = 2 * (dy - dx);
+			int x,y;
+
+			// determine which enpoint to use as start position
+			if( x0 > xEnd )
+			{
+				x = (int) xEnd;
+				y = (int) yEnd;
+				xEnd = x0;
+				delY = -1 * delY;
+			}
+			else
+			{
+				x = (int) x0;
+				y = (int) y0;
+			}
+
+			drawBigPixel(x,y, MAX_INTENSITY);
+
+			int dLower = 0;
+			int dUpper = 0;
+			while( x < xEnd )
+			{
+				x++;
+				dLower = (p * dy + 1) /2 ;
+
+				if( p < 0 ) 
+				{
+					p += twoDy;
+					drawBigPixel(x, y, 1-dLower);
+					drawBigPixel(x, y+1, dLower);
+				}
+				else
+				{
+					if( delY > 0 ) y++;
+					else y--;
+					p += twoDyMinusDx;
+					drawBigPixel(x, y, 1-dLower);
+					drawBigPixel(x, y+1, dLower);
+				}
+
+			}
+		}
+		// otherwise, |m| > 1.0
+		else
+		{
+			int p = 2 * dx - dy;
+			int twoDx = 2 * dx;
+			int twoDxMinusDy = 2 * (dx - dy);
+			int x,y;
+
+			if( y0 > yEnd )
+			{
+				x = (int) xEnd;
+				y = (int) yEnd;
+				yEnd = y0;
+				delX = -1 * delX;
+			}
+			else
+			{
+				x = (int) x0;
+				y = (int) y0;
+			}
+
+			drawBigPixel(x,y, MAX_INTENSITY);
+
+			while( y < yEnd )
+			{
+				y++;
+				if( p < 0 ) p += twoDx;
+				else
+				{
+					if( delX > 0 ) x++;
+					else x--;
+					p += twoDxMinusDy;
+				}
+				drawBigPixel(x,y, MAX_INTENSITY);
+			}
+		}
 	}
 
 	/*
@@ -378,14 +482,40 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 			int negY = -1 * y;
 
 			// check to not draw out of the big rectangle bound
-			if( x + x0 < BIGAREA_WIDTH && x + x0 > 0  && y + y0 > 0 && y + y0 < BIGAREA_HEIGHT)	drawBigPixel( (int) (x + x0), (int) (y + y0), MAX_INTENSITY );
-			if( negX + x0 < BIGAREA_WIDTH && negX + x0 > 0  && negY + y0 > 0 && negY + y0 < BIGAREA_HEIGHT) drawBigPixel( (int) (negX + x0), (int) (negY + y0), MAX_INTENSITY );
-			if( negX + x0 < BIGAREA_WIDTH && negX + x0 > 0  && y + y0 > 0 && y + y0 < BIGAREA_HEIGHT) drawBigPixel( (int) (negX + x0), (int) (y + y0), MAX_INTENSITY );
-			if( x + x0 < BIGAREA_WIDTH && x + x0 > 0  && negY + y0 > 0 && negY + y0 < BIGAREA_HEIGHT) drawBigPixel( (int) (x + x0), (int) (negY + y0), MAX_INTENSITY );
-			if( y + x0 < BIGAREA_WIDTH && y + x0 > 0  && x + y0 > 0 && x + y0 < BIGAREA_HEIGHT) drawBigPixel( (int) (y + x0), (int) (x + y0), MAX_INTENSITY );
-			if( y + x0 < BIGAREA_WIDTH && y + x0 > 0  && negX + y0 > 0 && negX + y0 < BIGAREA_HEIGHT) drawBigPixel( (int) (y + x0), (int) (negX + y0), MAX_INTENSITY );
-			if( negY + x0 < BIGAREA_WIDTH && negY + x0 > 0  && x + y0 > 0 && x + y0 < BIGAREA_HEIGHT) drawBigPixel( (int) (negY + x0), (int) (x + y0), MAX_INTENSITY );
-			if( negY + x0 < BIGAREA_WIDTH && negY + x0 > 0  && negX + y0 > 0 && negX + y0 < BIGAREA_HEIGHT) drawBigPixel( (int) (negY + x0), (int) (negX + y0), MAX_INTENSITY );
+			int widthLimit = BIGPIXEL_COLS;
+			int heightLimit = BIGPIXEL_ROWS;
+			if( Math.abs(x + x0) < widthLimit && x + x0 > 0  && y + y0 > 0 && Math.abs(y + y0) < heightLimit) 
+			{
+				drawBigPixel( (int) (x + x0), (int) (y + y0), MAX_INTENSITY );
+			}
+			if( Math.abs(negX + x0) < widthLimit && negX + x0 > 0  && negY + y0 > 0 && Math.abs(negY + y0) < heightLimit) 
+			{
+				drawBigPixel( (int) (negX + x0), (int) (negY + y0), MAX_INTENSITY );
+			}
+			if( Math.abs(negX + x0) < widthLimit && negX + x0 > 0  && y + y0 > 0 && Math.abs(y + y0) < heightLimit) 
+			{
+				drawBigPixel( (int) (negX + x0), (int) (y + y0), MAX_INTENSITY );
+			}
+			if( Math.abs(x + x0) < widthLimit && x + x0 > 0  && negY + y0 > 0 && Math.abs(negY + y0) < heightLimit) 
+			{
+				drawBigPixel( (int) (x + x0), (int) (negY + y0), MAX_INTENSITY );
+			}
+			if( Math.abs(y + x0) < widthLimit && y + x0 > 0  && x + y0 > 0 && Math.abs(x + y0) < heightLimit) 
+			{
+				drawBigPixel( (int) (y + x0), (int) (x + y0), MAX_INTENSITY );
+			}
+			if( Math.abs(y + x0) < widthLimit && y + x0 > 0  && negX + y0 > 0 && Math.abs(negX + y0) < heightLimit) 
+			{
+				drawBigPixel( (int) (y + x0), (int) (negX + y0), MAX_INTENSITY );
+			}
+			if( Math.abs(negY + x0) < widthLimit && negY + x0 > 0  && x + y0 > 0 && Math.abs(x + y0) < heightLimit) 
+			{
+				drawBigPixel( (int) (negY + x0), (int) (x + y0), MAX_INTENSITY );
+			}
+			if( Math.abs(negY + x0) < widthLimit && negY + x0 > 0  && negX + y0 > 0 && Math.abs(negX + y0) < heightLimit) 
+			{
+				drawBigPixel( (int) (negY + x0), (int) (negX + y0), MAX_INTENSITY );
+			}
 		}
 
 	}
@@ -398,6 +528,62 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 			double yEnd) {
 		return (int) Math.sqrt( Math.pow( yEnd - y0, 2 ) + Math.pow( xEnd - x0, 2 ) );
 	}
+
+	/* 
+
+	 method name: drawPixelArt
+
+	    takes in an int which represent an option and displays the "big pixel" (polygon)
+	    arts from the precalculated pixels read from external text file
+	    Note: Due to IO operation, this can take a while to run. Also, it looks best with smaller
+	    row and column number ( < 200 )
+
+	 parameters:
+	    pixelOption: 1 for Pokemon related art, 2 for Mario related art and 3 for Link (Zelda) related art
+
+	 */
+	private void drawPixelArt(int pixelOption)
+	{
+		String file = "";
+		if(pixelOption == 1) file = "pikachu";
+		else if(pixelOption == 2) file = "mario";
+		else file = "link";
+		try(
+				BufferedReader br = new BufferedReader(new FileReader( "txt/" + file + ".txt" ))) {
+			String line = br.readLine();
+
+			// take out width and height
+			String[] wh = line.split(", ");
+			int width = Integer.parseInt(wh[0]);
+			int height = Integer.parseInt(wh[1]);
+			//			System.out.println("WH = " + width + ", " + height);
+
+			// get coords & rgb
+			line = br.readLine();
+			while (line != null) {
+				String[] elements = line.split(", ");
+
+				double xOri = Double.parseDouble(elements[0]);
+				double yOri = Double.parseDouble(elements[1]);
+				double r = Integer.parseInt(elements[2]);
+				double g = Integer.parseInt(elements[3]);
+				double b = Integer.parseInt(elements[4]);
+
+				int translatedX = (int) ((xOri / width) * BIGPIXEL_COLS);
+				int translatedY = (int) ((yOri / height) * BIGPIXEL_ROWS);
+
+				drawBigPixel(translatedX, translatedY, r/255,g/255,b/255);
+				line = br.readLine();
+			}
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
 	/* 
 
 	 method name: drawBigPixel
@@ -422,6 +608,28 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 		// increased as we go up
 		int flip_y = Math.abs((BIGPIXEL_ROWS-1) - y);
 		gl.glColor3d(r * i, g * i, b * i);
+		gl.glBegin(GL2.GL_POLYGON);
+		gl.glVertex2d((double)x*BIGAREA_HEIGHT/BIGPIXEL_ROWS, 
+				(double)flip_y*BIGAREA_WIDTH/BIGPIXEL_COLS);
+		gl.glVertex2d((double)(x+1)*BIGAREA_HEIGHT/BIGPIXEL_ROWS, 
+				(double)flip_y*BIGAREA_WIDTH/BIGPIXEL_COLS);
+		gl.glVertex2d((double)(x+1)*BIGAREA_HEIGHT/BIGPIXEL_ROWS, 
+				(double)(flip_y+1)*BIGAREA_WIDTH/BIGPIXEL_COLS);
+		gl.glVertex2d((double)x*BIGAREA_HEIGHT/BIGPIXEL_ROWS, 
+				(double)(flip_y+1)*BIGAREA_WIDTH/BIGPIXEL_COLS);
+		gl.glEnd();
+
+	}
+
+	public void drawBigPixel(int x, int y, double red, double green, double blue)
+	{
+		// because the y screen coordinates increase as we go down 
+		// and the y world coordinates increase as we go up
+		// we need to compute flip_y which will be the y coordinate
+		// of the big pixel if the big pixel coordinates' y values
+		// increased as we go up
+		int flip_y = Math.abs((BIGPIXEL_ROWS-1) - y);
+		gl.glColor3d(red,green,blue);
 		gl.glBegin(GL2.GL_POLYGON);
 		gl.glVertex2d((double)x*BIGAREA_HEIGHT/BIGPIXEL_ROWS, 
 				(double)flip_y*BIGAREA_WIDTH/BIGPIXEL_COLS);
@@ -510,8 +718,21 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 			System.out.println("Entering antialiased line mode.");
 			activeMode = 3;
 			break;
+		case 'p':
+			System.out.println("Drawing Pikachu pixels art.");
+			activeMode = 4;
+			break;
+		case 'm':
+			System.out.println("Drawing Mario pixels art.");
+			activeMode = 5;
+			break;
+		case 'z':
+			System.out.println("Drawing Link (Zelda) pixels art.");
+			activeMode = 6;
+			break;
 		}
 	} // end keyTyped
+
 
 	//
 	// End of dealing with Keyboard Events
@@ -633,9 +854,9 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 			if (bigpixelySecond < 0)
 				bigpixelySecond = 0;
 
-			System.out.println("Please press r on your keyboard to reset the points.");
+			System.out.println("Please press r on your keyboard to reset the two points.");
 		}
-		//System.out.println("bigpixel x, y  = " + bigpixelx + ", " + bigpixely);
+//		System.out.println("bigpixel xSecond, ySecond  = " + bigpixelxSecond + ", " + bigpixelySecond);
 	}
 
 	public void mousePressed(MouseEvent me) { }
@@ -650,6 +871,5 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 	// End of dealing with Mouse Events
 	//
 	// ====================================================================================
-
 
 } // end class

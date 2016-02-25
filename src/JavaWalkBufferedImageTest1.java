@@ -32,7 +32,8 @@ public class JavaWalkBufferedImageTest1 extends Component {
 	}
 
 	/**
-	 * This is called first to start reading the file given through param fileName
+	 * This is called first to start reading the file given through param fileName.
+	 * To run this with the fileName, the actual PNG should be in the same folder as this code.
 	 * @param fileName
 	 */
 	public JavaWalkBufferedImageTest1(String fileName) {
@@ -49,7 +50,7 @@ public class JavaWalkBufferedImageTest1 extends Component {
 	}
 
 	/**
-	 * Go through image, and output into txt file as a save method
+	 * Go through image, and output into txt file as a save method.
 	 * @param image
 	 * @param fileName
 	 */
@@ -93,7 +94,7 @@ public class JavaWalkBufferedImageTest1 extends Component {
 	}
 	
 	/**
-	 * return rgb from java way of representing rgb
+	 * Return rgb from java way of representing rgb.
 	 * @param pixel
 	 * @return
 	 */

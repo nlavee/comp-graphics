@@ -83,7 +83,7 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 	private float b = 0;
 
 	// globals for offset
-	private double offSet = 0.001;
+	private double offSet = 0.0001;
 
 	public DrawAndHandleInput(GLCanvas c, int count, float red, float green, float blue)
 	{
@@ -258,21 +258,41 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 	} // end display
 
 	/*
-	 * Method to draw antialised line. 
-	 * The two points passed as parameters are the two ending points
-	 * of the line.
+	 * 		Method to draw line, both aliased and antialiased.
+	 * 		
+	 * 		The core calculations are the same, we just did a bit more calculation for dUpper and dLower if 
+	 * 		we want to draw antialiased line. 
+	 * 
+	 * 		The two points passed as parameters are the two ending points
+	 * 		of the line.
 	 */
 	private void drawLine(double x0,
 			double y0, double xEnd,
 			double yEnd, boolean antialiased) {
 
-		int delX = (int) (xEnd - x0);
-		int delY = (int) (yEnd - y0);
+		System.out.println("Two points: (" + x0 + ", " + y0 + ") - (" + xEnd + ", " + yEnd + ")");
 
+		/*
+		 * These are values for actual change in x and y
+		 * So we would know whether we should increment or decrement as we increase in step.
+		 */
+		int delX = (int) (Math.ceil(xEnd) - Math.ceil(x0));
+		int delY = (int) (Math.ceil(yEnd) - Math.ceil(y0));
+
+		/*
+		 * Calculate the absolute value for calculation of p
+		 */
 		int dx = (int) Math.abs(delX);
 		int dy = (int) Math.abs(delY);
 
-		// case where 0.0 < |m| < 1.0
+		System.out.println("dx: " + dx);
+		System.out.println("dy: " + dy);
+
+		/*
+		 *  Case where 0.0 < |m| < 1.0.
+		 *  Essentially, cases where we go along x-axis and decide whether to turn on 
+		 *  the pixel to the right or the pixel to the right and below/above.
+		 */
 		if(dy < dx)
 		{
 			/* 
@@ -300,7 +320,7 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 			// draw the starting point
 			drawBigPixel(x,y, MAX_INTENSITY);
 
-			while( x < xEnd )
+			while( x < Math.floor(xEnd) )
 			{
 				/*
 				 * We know that p = dx * (dLower - dUpper) & dLower + dUpper = 1
@@ -311,9 +331,18 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 				 * 			( (p / dx) + 1 ) /2 = dLower
 				 *  ==> dLower = ( (p / dx) + 1 ) /2
 				 *  ==> dUpper = 1 - dLower
+				 *  
+				 *  We only calculate this if we want to draw antialiased line.
+				 *  Else, we don't need to waste our computation here.
 				 */
-				double dLower = ( (double) p / dx + 1) / 2;
-				double dUpper = 1 - dLower;
+				double dLower = -1;
+				double dUpper = -1;
+				if(antialiased)
+				{
+					dLower = Math.abs(( (double) p / dx + 1) / 2);
+					dUpper = 1 - dLower;
+				}
+				//System.out.println(dLower + " - " + dUpper);
 
 				x++;
 
@@ -334,6 +363,10 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 					p += twoDyMinusDx;
 				}
 
+				/*
+				 * If the mode is antialiased, we do different operations.
+				 * Else, we just going to draw the point.
+				 */
 				if(antialiased)
 				{
 					/*
@@ -348,8 +381,11 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 						 */
 						if(dUpper != dLower)
 						{
-							drawBigPixel(x,y+1, r + dUpper*(r + offSet), g + dUpper*(g + offSet), b + dUpper*(b + offSet)); // TODO adding offSet to take care of cases when r = 0 ?!
-							drawBigPixel(x,y, r + dLower*(r + offSet), g + dLower*(g + offSet), b + dLower*(b + offSet));
+							System.out.println("We are in here");
+							//							drawBigPixel(x,y+1, r + dUpper*(r + offSet), g + dUpper*(g + offSet), b + dUpper*(b + offSet)); // TODO adding offSet to take care of cases when r = 0 ?!
+							//							drawBigPixel(x,y, r + dLower*(r + offSet), g + dLower*(g + offSet), b + dLower*(b + offSet));
+							drawBigPixel(x,y+1, dUpper, dUpper, dUpper); 
+							drawBigPixel(x,y, dLower, dLower, dLower);
 						}
 						/*
 						 * If the line passes through the center, we are just 
@@ -379,14 +415,17 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 					}
 					//				System.out.println(dLower + " - " + dUpper);
 				}
+				/*
+				 * Drawing aliased line
+				 */
 				else
 				{
 					drawBigPixel(x,y, MAX_INTENSITY);
 				}
 			}
 		}
-		// otherwise, |m| > 1.0
-		/*
+		/* Otherwise, |m| > 1.0
+		 * We go along y-axis and choose which pixel of x to turn on.
 		 * This is essentially same as the above,
 		 * just switching y and x.
 		 */
@@ -412,10 +451,19 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 
 			drawBigPixel(x,y, MAX_INTENSITY);
 
-			while( y < yEnd )
+			while( y < Math.floor(yEnd) )
 			{
-				double dLower = ( (double) p / dy + 1) / 2;
-				double dUpper = 1 - dLower;
+				/*
+				 * Similar to above, only calculate these two values if we're drawing antialiased line.
+				 * Else, we don't need to waste computation time here.
+				 */
+				double dLower = -1;
+				double dUpper = -1;
+				if(antialiased)
+				{
+					dLower = ( (double) p / dy + 1) / 2;
+					dUpper = 1 - dLower;
+				}
 
 				y++;
 				if( p < 0 ) p += twoDx;
@@ -426,6 +474,9 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 					p += twoDxMinusDy;
 				}
 
+				/*
+				 * Similar to above, drawing antialiased line has some special computation
+				 */
 				if(antialiased)
 				{
 					if( delX > 0 ) 
@@ -460,6 +511,9 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 					}
 					//				System.out.println(dLower + " - " + dUpper);
 				}
+				/*
+				 * Drawing aliased line
+				 */
 				else
 				{
 					drawBigPixel(x,y, MAX_INTENSITY);
@@ -469,95 +523,6 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 		}
 
 	}
-
-	//	/*
-	//	 * Method to implement Bresenham line with the two 
-	//	 * points given in the parameters.
-	//	 * 
-	//	 * Credit: Bresenham's Line Algorithm from class note
-	//	 */
-	//	private void drawRegularLine(double x0,
-	//			double y0, double xEnd,
-	//			double yEnd) {
-	//		int dx = (int) Math.abs(xEnd - x0);
-	//		int dy = (int) Math.abs(yEnd - y0);
-	//		int delX = (int) (xEnd - x0);
-	//		int delY = (int) (yEnd - y0);
-	//
-	//		// case where 0.0 < |m| < 1.0
-	//		if(dy < dx)
-	//		{
-	//			int p = 2 * dy - dx;
-	//			int twoDy = 2 * dy;
-	//			int twoDyMinusDx = 2 * (dy - dx);
-	//			int x,y;
-	//
-	//			// determine which enpoint to use as start position
-	//			if( x0 > xEnd )
-	//			{
-	//				x = (int) xEnd;
-	//				y = (int) yEnd;
-	//				xEnd = x0;
-	//				delY = -1 * delY;
-	//			}
-	//			else
-	//			{
-	//				x = (int) x0;
-	//				y = (int) y0;
-	//			}
-	//
-	//			drawBigPixel(x,y, MAX_INTENSITY);
-	//
-	//			while( x < xEnd )
-	//			{
-	//				x++;
-	//				if( p < 0 ) p += twoDy;
-	//				else
-	//				{
-	//					if( delY > 0 ) y++;
-	//					else y--;
-	//					p += twoDyMinusDx;
-	//				}
-	//				drawBigPixel(x,y, MAX_INTENSITY);
-	//			}
-	//		}
-	//		// otherwise, |m| > 1.0
-	//		else
-	//		{
-	//			int p = 2 * dx - dy;
-	//			int twoDx = 2 * dx;
-	//			int twoDxMinusDy = 2 * (dx - dy);
-	//			int x,y;
-	//
-	//			if( y0 > yEnd )
-	//			{
-	//				x = (int) xEnd;
-	//				y = (int) yEnd;
-	//				yEnd = y0;
-	//				delX = -1 * delX;
-	//			}
-	//			else
-	//			{
-	//				x = (int) x0;
-	//				y = (int) y0;
-	//			}
-	//
-	//			drawBigPixel(x,y, MAX_INTENSITY);
-	//
-	//			while( y < yEnd )
-	//			{
-	//				y++;
-	//				if( p < 0 ) p += twoDx;
-	//				else
-	//				{
-	//					if( delX > 0 ) x++;
-	//					else x--;
-	//					p += twoDxMinusDy;
-	//				}
-	//				drawBigPixel(x,y, MAX_INTENSITY);
-	//			}
-	//		}
-	//	}
 
 	/*
 	 * Method to draw circle based on two points.
@@ -605,7 +570,7 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 			 */
 			int widthLimit = BIGPIXEL_COLS;
 			int heightLimit = BIGPIXEL_ROWS;
-			
+
 			/*
 			 * Translate back to point we need to draw by adding with the coords of (x0, y0).
 			 * Check to see it's not out of the bounded area that we need.
@@ -652,7 +617,8 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 	 */
 	private int calculateDistance(double x0, double y0, double xEnd,
 			double yEnd) {
-		return (int) Math.sqrt( Math.pow( yEnd - y0, 2 ) + Math.pow( xEnd - x0, 2 ) );
+		return (int) Math.sqrt( Math.pow( Math.floor(yEnd) - Math.floor(y0), 2 ) 
+				+ Math.pow( Math.floor(xEnd) - Math.floor(x0), 2 ) );
 	}
 
 	/* 
@@ -677,8 +643,8 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 		if(pixelOption == 1) file = "pikachu";
 		else if(pixelOption == 2) file = "mario";
 		else file = "link";
-		
-		
+
+
 		try(BufferedReader br = new BufferedReader(new FileReader( "txt/" + file + ".txt" ))) {
 			/*
 			 * Read through save file to get pixel information
@@ -694,7 +660,7 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 			// get coords & rgb
 			line = br.readLine();
 			while (line != null) {
-				
+
 				/*
 				 * Split the string into an array of values.
 				 */
@@ -793,6 +759,7 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 		// of the big pixel if the big pixel coordinates' y values
 		// increased as we go up
 		int flip_y = Math.abs((BIGPIXEL_ROWS-1) - y);
+		//System.out.println("Color: " + red + " - " + green + " - " + blue);
 		gl.glColor3d(red,green,blue);
 		gl.glBegin(GL2.GL_POLYGON);
 		gl.glVertex2d((double)x*BIGAREA_HEIGHT/BIGPIXEL_ROWS, 

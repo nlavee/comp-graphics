@@ -38,6 +38,7 @@ public class ExampleMain {
 		 */
 		boolean acceptInput = false;
 		int numRowCol = 0;
+		
 		while(!acceptInput)
 		{
 			System.out.println("Please enter a number for row and column: \n(We suggest > 10)");
@@ -60,6 +61,9 @@ public class ExampleMain {
 			}
 		}
 
+		/*
+		 * Getting user input for rgb color
+		 */
 		float r = 0;
 		float g = 0;
 		float b = 0;

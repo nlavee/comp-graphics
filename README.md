@@ -11,7 +11,8 @@ e.g.:
 * **Circle Drawing Algorithm** (*key: "c"*)
 e.g.:  
 ![Circle Drawing Algorithm](img/CircleDrawingAlgorithmExample.png)
-* 
+* **Antialiased Line Drawing** (*key: "a")
+e.g.:
 
 ## Extra learning things:
 * **Generate Image from Saved File** (*key: "p" or "m" or "z"*)

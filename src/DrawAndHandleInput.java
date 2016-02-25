@@ -82,6 +82,9 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 	private float g = 0;
 	private float b = 0;
 
+	// globals for offset
+	private double offSet = 0;
+	
 	public DrawAndHandleInput(GLCanvas c, int count, float red, float green, float blue)
 	{
 		this.canvas = c;
@@ -262,6 +265,192 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 			double y0, double xEnd,
 			double yEnd) {
 		
+		int delX = (int) (xEnd - x0);
+		int delY = (int) (yEnd - y0);
+
+		int dx = (int) Math.abs(delX);
+		int dy = (int) Math.abs(delY);
+		
+		// case where 0.0 < |m| < 1.0
+		if(dy < dx)
+		{
+			/* 
+			 * Calculate the necessary components
+			 */
+			int p = 2 * dy - dx;
+			int twoDy = 2 * dy;
+			int twoDyMinusDx = 2 * (dy - dx);
+			int x,y;
+
+			// determine which end point to use as start position
+			if( x0 > xEnd )
+			{
+				x = (int) xEnd;
+				y = (int) yEnd;
+				xEnd = x0;
+				delY = -1 * delY;
+			}
+			else
+			{
+				x = (int) x0;
+				y = (int) y0;
+			}
+
+			// draw the starting point
+			drawBigPixel(x,y, MAX_INTENSITY);
+
+			while( x < xEnd )
+			{
+				/*
+				 * We know that p = dx * (dLower - dUpper) & dLower + dUpper = 1
+				 * Therefore, 
+				 * 			p / dx = dLower - dUpper
+				 * 			(p / dx) + 1 = dLower - dUpper + dLower + dUpper
+				 * 			(p / dx) + 1 = 2 * dLower
+				 * 			( (p / dx) + 1 ) /2 = dLower
+				 *  ==> dLower = ( (p / dx) + 1 ) /2
+				 *  ==> dUpper = 1 - dLower
+				 */
+				double dLower = ( (double) p / dx + 1) / 2;
+				double dUpper = 1 - dLower;
+
+				x++;
+				
+				if( p < 0 ) 
+				{
+					p += twoDy;
+				}
+				else
+				{
+					/**
+					 * Cases of negative and positive slope.
+					 * For positive slope, we go increment.
+					 * For negative slope, we go decrement.
+					 */
+					if( delY > 0 ) y++;
+					else y--;
+					
+					p += twoDyMinusDx;
+				}
+
+				/*
+				 * For positive slope
+				 */
+				if( delY > 0 )
+				{
+					/*
+					 * the line passes through unequal amount for two pixels.
+					 * Whichever pixel has higher percentage (dUpper vs. dLower),
+					 * we give it more.
+					 */
+					if(dUpper != dLower)
+					{
+						drawBigPixel(x,y+1, r + dUpper*(r + offSet), g + dUpper*(g + offSet), b + dUpper*(b + offSet)); // TODO adding offSet to take care of cases when r = 0 ?!
+						drawBigPixel(x,y, r + dLower*(r + offSet), g + dLower*(g + offSet), b + dLower*(b + offSet));
+					}
+					/*
+					 * If the line passes through the center, we are just 
+					 * going to draw the chosen point
+					 */
+					else
+					{
+						drawBigPixel(x,y, r, g , b);
+					}
+				}
+				/*
+				 * For negative slope, we consider between pixel to the right 
+				 * or pixel right & below.
+				 * Instead of y + 1 as above, we draw y - 1 
+				 */
+				else 
+				{
+					if(dUpper != dLower)
+					{
+						drawBigPixel(x,y-1, r + dUpper*(r + offSet), g + dUpper*(g + offSet), b + dUpper*(b + offSet));
+						drawBigPixel(x,y, r + dLower*(r + offSet), g + dLower*(g + offSet), b + dLower*(b + offSet));
+					}
+					else
+					{
+						drawBigPixel(x,y, r, g , b);
+					}
+				}
+//				System.out.println(dLower + " - " + dUpper);
+			}
+		}
+		// otherwise, |m| > 1.0
+		/*
+		 * This is essentially same as the above,
+		 * just switching y and x.
+		 */
+		else
+		{
+			int p = 2 * dx - dy;
+			int twoDx = 2 * dx;
+			int twoDxMinusDy = 2 * (dx - dy);
+			int x,y;
+
+			if( y0 > yEnd )
+			{
+				x = (int) xEnd;
+				y = (int) yEnd;
+				yEnd = y0;
+				delX = -1 * delX;
+			}
+			else
+			{
+				x = (int) x0;
+				y = (int) y0;
+			}
+
+			drawBigPixel(x,y, MAX_INTENSITY);
+
+			while( y < yEnd )
+			{
+				double dLower = ( (double) p / dy + 1) / 2;
+				double dUpper = 1 - dLower;
+				
+				y++;
+				if( p < 0 ) p += twoDx;
+				else
+				{
+					if( delX > 0 ) x++;
+					else x--;
+					p += twoDxMinusDy;
+				}
+
+				if( delX > 0 ) 
+				{
+					/*
+					 * We consider between the pixel up or pixel up & right
+					 */
+					if(dUpper != dLower)
+					{
+						drawBigPixel(x+1,y, r + dUpper*(r + offSet), g + dUpper*(g + offSet), b + dUpper*(b + offSet));
+						drawBigPixel(x,y, r + dLower*(r + offSet), g + dLower*(g + offSet), b + dLower*(b + offSet));
+					}
+					else
+					{
+						drawBigPixel(x,y, r, g , b);
+					}
+				}
+				else 
+				{
+					/*
+					 * We consider between the pixel up or pixel up & left
+					 */
+					if(dUpper != dLower)
+					{
+						drawBigPixel(x-1,y, r + dUpper*(r + offSet), g + dUpper*(g + offSet), b + dUpper*(b + offSet));
+						drawBigPixel(x,y, r + dLower*(r + offSet), g + dLower*(g + offSet), b + dLower*(b + offSet));
+					}
+					else
+					{
+						drawBigPixel(x,y, r, g , b);
+					}
+				}
+//				System.out.println(dLower + " - " + dUpper);
+			}
+		}
 	}
 
 	/*
@@ -787,7 +976,7 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 
 			System.out.println("Please press r on your keyboard to reset the two points.");
 		}
-//		System.out.println("bigpixel xSecond, ySecond  = " + bigpixelxSecond + ", " + bigpixelySecond);
+		//		System.out.println("bigpixel xSecond, ySecond  = " + bigpixelxSecond + ", " + bigpixelySecond);
 	}
 
 	public void mousePressed(MouseEvent me) { }

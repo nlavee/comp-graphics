@@ -83,8 +83,8 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 	private float b = 0;
 
 	// globals for offset
-	private double offSet = 0;
-	
+	private double offSet = 0.001;
+
 	public DrawAndHandleInput(GLCanvas c, int count, float red, float green, float blue)
 	{
 		this.canvas = c;
@@ -221,12 +221,13 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 			else if(activeMode == 2)
 			{
 				// regular line mode
-				drawRegularLine(bigpixelxFirst, bigpixelyFirst, bigpixelxSecond, bigpixelySecond);
+				//				drawRegularLine(bigpixelxFirst, bigpixelyFirst, bigpixelxSecond, bigpixelySecond);
+				drawLine(bigpixelxFirst, bigpixelyFirst, bigpixelxSecond, bigpixelySecond, false);
 			}
 			else if(activeMode == 3)
 			{
 				// antialiased mode
-				drawAntialiasedLine(bigpixelxFirst, bigpixelyFirst, bigpixelxSecond, bigpixelySecond);
+				drawLine(bigpixelxFirst, bigpixelyFirst, bigpixelxSecond, bigpixelySecond, true);
 			}
 			else if(activeMode == 4)
 			{
@@ -261,16 +262,16 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 	 * The two points passed as parameters are the two ending points
 	 * of the line.
 	 */
-	private void drawAntialiasedLine(double x0,
+	private void drawLine(double x0,
 			double y0, double xEnd,
-			double yEnd) {
-		
+			double yEnd, boolean antialiased) {
+
 		int delX = (int) (xEnd - x0);
 		int delY = (int) (yEnd - y0);
 
 		int dx = (int) Math.abs(delX);
 		int dy = (int) Math.abs(delY);
-		
+
 		// case where 0.0 < |m| < 1.0
 		if(dy < dx)
 		{
@@ -315,7 +316,7 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 				double dUpper = 1 - dLower;
 
 				x++;
-				
+
 				if( p < 0 ) 
 				{
 					p += twoDy;
@@ -329,52 +330,59 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 					 */
 					if( delY > 0 ) y++;
 					else y--;
-					
+
 					p += twoDyMinusDx;
 				}
 
-				/*
-				 * For positive slope
-				 */
-				if( delY > 0 )
+				if(antialiased)
 				{
 					/*
-					 * the line passes through unequal amount for two pixels.
-					 * Whichever pixel has higher percentage (dUpper vs. dLower),
-					 * we give it more.
+					 * For positive slope
 					 */
-					if(dUpper != dLower)
+					if( delY > 0 )
 					{
-						drawBigPixel(x,y+1, r + dUpper*(r + offSet), g + dUpper*(g + offSet), b + dUpper*(b + offSet)); // TODO adding offSet to take care of cases when r = 0 ?!
-						drawBigPixel(x,y, r + dLower*(r + offSet), g + dLower*(g + offSet), b + dLower*(b + offSet));
+						/*
+						 * the line passes through unequal amount for two pixels.
+						 * Whichever pixel has higher percentage (dUpper vs. dLower),
+						 * we give it more.
+						 */
+						if(dUpper != dLower)
+						{
+							drawBigPixel(x,y+1, r + dUpper*(r + offSet), g + dUpper*(g + offSet), b + dUpper*(b + offSet)); // TODO adding offSet to take care of cases when r = 0 ?!
+							drawBigPixel(x,y, r + dLower*(r + offSet), g + dLower*(g + offSet), b + dLower*(b + offSet));
+						}
+						/*
+						 * If the line passes through the center, we are just 
+						 * going to draw the chosen point
+						 */
+						else
+						{
+							drawBigPixel(x,y, r, g , b);
+						}
 					}
 					/*
-					 * If the line passes through the center, we are just 
-					 * going to draw the chosen point
+					 * For negative slope, we consider between pixel to the right 
+					 * or pixel right & below.
+					 * Instead of y + 1 as above, we draw y - 1 
 					 */
-					else
+					else 
 					{
-						drawBigPixel(x,y, r, g , b);
+						if(dUpper != dLower)
+						{
+							drawBigPixel(x,y-1, r + dUpper*(r + offSet), g + dUpper*(g + offSet), b + dUpper*(b + offSet));
+							drawBigPixel(x,y, r + dLower*(r + offSet), g + dLower*(g + offSet), b + dLower*(b + offSet));
+						}
+						else
+						{
+							drawBigPixel(x,y, r, g , b);
+						}
 					}
+					//				System.out.println(dLower + " - " + dUpper);
 				}
-				/*
-				 * For negative slope, we consider between pixel to the right 
-				 * or pixel right & below.
-				 * Instead of y + 1 as above, we draw y - 1 
-				 */
-				else 
+				else
 				{
-					if(dUpper != dLower)
-					{
-						drawBigPixel(x,y-1, r + dUpper*(r + offSet), g + dUpper*(g + offSet), b + dUpper*(b + offSet));
-						drawBigPixel(x,y, r + dLower*(r + offSet), g + dLower*(g + offSet), b + dLower*(b + offSet));
-					}
-					else
-					{
-						drawBigPixel(x,y, r, g , b);
-					}
+					drawBigPixel(x,y, MAX_INTENSITY);
 				}
-//				System.out.println(dLower + " - " + dUpper);
 			}
 		}
 		// otherwise, |m| > 1.0
@@ -408,7 +416,7 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 			{
 				double dLower = ( (double) p / dy + 1) / 2;
 				double dUpper = 1 - dLower;
-				
+
 				y++;
 				if( p < 0 ) p += twoDx;
 				else
@@ -418,129 +426,138 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 					p += twoDxMinusDy;
 				}
 
-				if( delX > 0 ) 
+				if(antialiased)
 				{
-					/*
-					 * We consider between the pixel up or pixel up & right
-					 */
-					if(dUpper != dLower)
+					if( delX > 0 ) 
 					{
-						drawBigPixel(x+1,y, r + dUpper*(r + offSet), g + dUpper*(g + offSet), b + dUpper*(b + offSet));
-						drawBigPixel(x,y, r + dLower*(r + offSet), g + dLower*(g + offSet), b + dLower*(b + offSet));
+						/*
+						 * We consider between the pixel up or pixel up & right
+						 */
+						if(dUpper != dLower)
+						{
+							drawBigPixel(x+1,y, r + dUpper*(r + offSet), g + dUpper*(g + offSet), b + dUpper*(b + offSet));
+							drawBigPixel(x,y, r + dLower*(r + offSet), g + dLower*(g + offSet), b + dLower*(b + offSet));
+						}
+						else
+						{
+							drawBigPixel(x,y, r, g , b);
+						}
 					}
-					else
+					else 
 					{
-						drawBigPixel(x,y, r, g , b);
+						/*
+						 * We consider between the pixel up or pixel up & left
+						 */
+						if(dUpper != dLower)
+						{
+							drawBigPixel(x-1,y, r + dUpper*(r + offSet), g + dUpper*(g + offSet), b + dUpper*(b + offSet));
+							drawBigPixel(x,y, r + dLower*(r + offSet), g + dLower*(g + offSet), b + dLower*(b + offSet));
+						}
+						else
+						{
+							drawBigPixel(x,y, r, g , b);
+						}
 					}
+					//				System.out.println(dLower + " - " + dUpper);
 				}
-				else 
-				{
-					/*
-					 * We consider between the pixel up or pixel up & left
-					 */
-					if(dUpper != dLower)
-					{
-						drawBigPixel(x-1,y, r + dUpper*(r + offSet), g + dUpper*(g + offSet), b + dUpper*(b + offSet));
-						drawBigPixel(x,y, r + dLower*(r + offSet), g + dLower*(g + offSet), b + dLower*(b + offSet));
-					}
-					else
-					{
-						drawBigPixel(x,y, r, g , b);
-					}
-				}
-//				System.out.println(dLower + " - " + dUpper);
-			}
-		}
-	}
-
-	/*
-	 * Method to implement Bresenham line with the two 
-	 * points given in the parameters.
-	 * 
-	 * Credit: Bresenham's Line Algorithm from class note
-	 */
-	private void drawRegularLine(double x0,
-			double y0, double xEnd,
-			double yEnd) {
-		int dx = (int) Math.abs(xEnd - x0);
-		int dy = (int) Math.abs(yEnd - y0);
-		int delX = (int) (xEnd - x0);
-		int delY = (int) (yEnd - y0);
-
-		// case where 0.0 < |m| < 1.0
-		if(dy < dx)
-		{
-			int p = 2 * dy - dx;
-			int twoDy = 2 * dy;
-			int twoDyMinusDx = 2 * (dy - dx);
-			int x,y;
-
-			// determine which enpoint to use as start position
-			if( x0 > xEnd )
-			{
-				x = (int) xEnd;
-				y = (int) yEnd;
-				xEnd = x0;
-				delY = -1 * delY;
-			}
-			else
-			{
-				x = (int) x0;
-				y = (int) y0;
-			}
-
-			drawBigPixel(x,y, MAX_INTENSITY);
-
-			while( x < xEnd )
-			{
-				x++;
-				if( p < 0 ) p += twoDy;
 				else
 				{
-					if( delY > 0 ) y++;
-					else y--;
-					p += twoDyMinusDx;
+					drawBigPixel(x,y, MAX_INTENSITY);
 				}
-				drawBigPixel(x,y, MAX_INTENSITY);
 			}
+
 		}
-		// otherwise, |m| > 1.0
-		else
-		{
-			int p = 2 * dx - dy;
-			int twoDx = 2 * dx;
-			int twoDxMinusDy = 2 * (dx - dy);
-			int x,y;
 
-			if( y0 > yEnd )
-			{
-				x = (int) xEnd;
-				y = (int) yEnd;
-				yEnd = y0;
-				delX = -1 * delX;
-			}
-			else
-			{
-				x = (int) x0;
-				y = (int) y0;
-			}
-
-			drawBigPixel(x,y, MAX_INTENSITY);
-
-			while( y < yEnd )
-			{
-				y++;
-				if( p < 0 ) p += twoDx;
-				else
-				{
-					if( delX > 0 ) x++;
-					else x--;
-					p += twoDxMinusDy;
-				}
-				drawBigPixel(x,y, MAX_INTENSITY);
-			}
-		}
 	}
+
+	//	/*
+	//	 * Method to implement Bresenham line with the two 
+	//	 * points given in the parameters.
+	//	 * 
+	//	 * Credit: Bresenham's Line Algorithm from class note
+	//	 */
+	//	private void drawRegularLine(double x0,
+	//			double y0, double xEnd,
+	//			double yEnd) {
+	//		int dx = (int) Math.abs(xEnd - x0);
+	//		int dy = (int) Math.abs(yEnd - y0);
+	//		int delX = (int) (xEnd - x0);
+	//		int delY = (int) (yEnd - y0);
+	//
+	//		// case where 0.0 < |m| < 1.0
+	//		if(dy < dx)
+	//		{
+	//			int p = 2 * dy - dx;
+	//			int twoDy = 2 * dy;
+	//			int twoDyMinusDx = 2 * (dy - dx);
+	//			int x,y;
+	//
+	//			// determine which enpoint to use as start position
+	//			if( x0 > xEnd )
+	//			{
+	//				x = (int) xEnd;
+	//				y = (int) yEnd;
+	//				xEnd = x0;
+	//				delY = -1 * delY;
+	//			}
+	//			else
+	//			{
+	//				x = (int) x0;
+	//				y = (int) y0;
+	//			}
+	//
+	//			drawBigPixel(x,y, MAX_INTENSITY);
+	//
+	//			while( x < xEnd )
+	//			{
+	//				x++;
+	//				if( p < 0 ) p += twoDy;
+	//				else
+	//				{
+	//					if( delY > 0 ) y++;
+	//					else y--;
+	//					p += twoDyMinusDx;
+	//				}
+	//				drawBigPixel(x,y, MAX_INTENSITY);
+	//			}
+	//		}
+	//		// otherwise, |m| > 1.0
+	//		else
+	//		{
+	//			int p = 2 * dx - dy;
+	//			int twoDx = 2 * dx;
+	//			int twoDxMinusDy = 2 * (dx - dy);
+	//			int x,y;
+	//
+	//			if( y0 > yEnd )
+	//			{
+	//				x = (int) xEnd;
+	//				y = (int) yEnd;
+	//				yEnd = y0;
+	//				delX = -1 * delX;
+	//			}
+	//			else
+	//			{
+	//				x = (int) x0;
+	//				y = (int) y0;
+	//			}
+	//
+	//			drawBigPixel(x,y, MAX_INTENSITY);
+	//
+	//			while( y < yEnd )
+	//			{
+	//				y++;
+	//				if( p < 0 ) p += twoDx;
+	//				else
+	//				{
+	//					if( delX > 0 ) x++;
+	//					else x--;
+	//					p += twoDxMinusDy;
+	//				}
+	//				drawBigPixel(x,y, MAX_INTENSITY);
+	//			}
+	//		}
+	//	}
 
 	/*
 	 * Method to draw circle based on two points.
@@ -582,9 +599,17 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 			int negX = -1 * x;
 			int negY = -1 * y;
 
-			// check to not draw out of the big rectangle bound
+			/*
+			 * Bound for width: 0 --> BIGPIXEL_COLS
+			 * Bound for height: 0 --> BIGPIXEL_ROWS
+			 */
 			int widthLimit = BIGPIXEL_COLS;
 			int heightLimit = BIGPIXEL_ROWS;
+			
+			/*
+			 * Translate back to point we need to draw by adding with the coords of (x0, y0).
+			 * Check to see it's not out of the bounded area that we need.
+			 */
 			if( Math.abs(x + x0) < widthLimit && x + x0 > 0  && y + y0 > 0 && Math.abs(y + y0) < heightLimit) 
 			{
 				drawBigPixel( (int) (x + x0), (int) (y + y0), MAX_INTENSITY );
@@ -645,12 +670,19 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 	 */
 	private void drawPixelArt(int pixelOption)
 	{
+		/*
+		 * Specify what file we want
+		 */
 		String file = "";
 		if(pixelOption == 1) file = "pikachu";
 		else if(pixelOption == 2) file = "mario";
 		else file = "link";
-		try(
-				BufferedReader br = new BufferedReader(new FileReader( "txt/" + file + ".txt" ))) {
+		
+		
+		try(BufferedReader br = new BufferedReader(new FileReader( "txt/" + file + ".txt" ))) {
+			/*
+			 * Read through save file to get pixel information
+			 */
 			String line = br.readLine();
 
 			// take out width and height
@@ -662,14 +694,26 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 			// get coords & rgb
 			line = br.readLine();
 			while (line != null) {
+				
+				/*
+				 * Split the string into an array of values.
+				 */
 				String[] elements = line.split(", ");
 
+				/*
+				 * I do not bother to do try catch here since
+				 * I have gone through and made sure that the saved file
+				 * only has numbers.
+				 */
 				double xOri = Double.parseDouble(elements[0]);
 				double yOri = Double.parseDouble(elements[1]);
 				double r = Integer.parseInt(elements[2]);
 				double g = Integer.parseInt(elements[3]);
 				double b = Integer.parseInt(elements[4]);
 
+				/*
+				 * Translate X and Y to the screen that we have.
+				 */
 				int translatedX = (int) ((xOri / width) * BIGPIXEL_COLS);
 				int translatedY = (int) ((yOri / height) * BIGPIXEL_ROWS);
 

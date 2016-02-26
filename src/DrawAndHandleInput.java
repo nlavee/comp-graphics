@@ -309,6 +309,7 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 				x = (int) xEnd;
 				y = (int) yEnd;
 				xEnd = x0;
+				yEnd = y0;
 				delY = -1 * delY;
 			}
 			else
@@ -317,10 +318,22 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 				y = (int) y0;
 			}
 
-			// draw the starting point
-			drawBigPixel(x,y, MAX_INTENSITY);
+			/*
+			 * if antialiased line, we will only allow black color line for now.
+			 * Else, we draw with color.
+			 */
+			if(antialiased)
+			{
+				drawBigPixel(x,y, 0,0,0);
+				drawBigPixel( (int) Math.floor(xEnd), (int) Math.floor(yEnd), 0, 0, 0);
+			}
+			else
+			{
+				drawBigPixel(x,y, MAX_INTENSITY);
+				drawBigPixel( (int) Math.floor(xEnd), (int) Math.floor(yEnd), MAX_INTENSITY);
+			}
 
-			while( x < Math.floor(xEnd) )
+			while( x < Math.floor(xEnd)-1 )
 			{
 				/*
 				 * We know that p = dx * (dLower - dUpper) & dLower + dUpper = 1
@@ -342,10 +355,12 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 					dLower = Math.abs(( (double) p / dx + 1) / 2);
 					dUpper = 1 - dLower;
 				}
-				//System.out.println(dLower + " - " + dUpper);
+
+				System.out.println(dLower + " - " + dUpper);
 
 				x++;
 
+				boolean move = false;
 				if( p < 0 ) 
 				{
 					p += twoDy;
@@ -359,7 +374,7 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 					 */
 					if( delY > 0 ) y++;
 					else y--;
-
+					move = true;
 					p += twoDyMinusDx;
 				}
 
@@ -379,21 +394,31 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 						 * Whichever pixel has higher percentage (dUpper vs. dLower),
 						 * we give it more.
 						 */
-						if(dUpper != dLower)
+						if(move && dLower != dUpper)
 						{
-							System.out.println("We are in here");
-							//							drawBigPixel(x,y+1, r + dUpper*(r + offSet), g + dUpper*(g + offSet), b + dUpper*(b + offSet)); // TODO adding offSet to take care of cases when r = 0 ?!
-							//							drawBigPixel(x,y, r + dLower*(r + offSet), g + dLower*(g + offSet), b + dLower*(b + offSet));
-							drawBigPixel(x,y+1, dUpper, dUpper, dUpper); 
+							System.out.println("(x,y-1) : " + x + ", " + (y-1) + " - " + dUpper);
+							System.out.println("(x,y) : " + x + ", " + y + " - " + dLower);
+							System.out.println();
+							drawBigPixel(x,y-1, dUpper, dUpper, dUpper); 
 							drawBigPixel(x,y, dLower, dLower, dLower);
 						}
 						/*
 						 * If the line passes through the center, we are just 
 						 * going to draw the chosen point
 						 */
+						else if(!move && dLower != dUpper)
+						{
+							System.out.println("(x,y+1) : " + x + ", " + (y+1) + " - " + dUpper);
+							System.out.println("(x,y) : " + x + ", " + y + " - " + dLower);
+							System.out.println();
+							drawBigPixel(x,y+1, dUpper, dUpper, dUpper); 
+							drawBigPixel(x,y, dLower, dLower, dLower);
+						}
 						else
 						{
-							drawBigPixel(x,y, r, g , b);
+							System.out.println("Center (x,y) : " + x + ", " + y);
+							System.out.println();
+							drawBigPixel(x,y,0d,0d,0d);
 						}
 					}
 					/*
@@ -403,17 +428,21 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 					 */
 					else 
 					{
-						if(dUpper != dLower)
+						if(move && dUpper != dLower)
 						{
-							drawBigPixel(x,y-1, r + dUpper*(r + offSet), g + dUpper*(g + offSet), b + dUpper*(b + offSet));
-							drawBigPixel(x,y, r + dLower*(r + offSet), g + dLower*(g + offSet), b + dLower*(b + offSet));
+							drawBigPixel(x,y+1, dUpper, dUpper, dUpper); 
+							drawBigPixel(x,y, dLower, dLower, dLower);
+						}
+						else if(!move && dUpper != dLower)
+						{
+							drawBigPixel(x,y-1, dUpper, dUpper, dUpper); 
+							drawBigPixel(x,y, dLower, dLower, dLower);
 						}
 						else
 						{
-							drawBigPixel(x,y, r, g , b);
+							drawBigPixel(x,y, 0d, 0d, 0d);
 						}
 					}
-					//				System.out.println(dLower + " - " + dUpper);
 				}
 				/*
 				 * Drawing aliased line
@@ -441,6 +470,7 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 				x = (int) xEnd;
 				y = (int) yEnd;
 				yEnd = y0;
+				xEnd = x0;
 				delX = -1 * delX;
 			}
 			else
@@ -449,9 +479,22 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 				y = (int) y0;
 			}
 
-			drawBigPixel(x,y, MAX_INTENSITY);
+			/*
+			 * if antialiased line, we will only allow black color line for now.
+			 * Else, we draw with color.
+			 */
+			if(antialiased)
+			{
+				drawBigPixel(x,y, 0,0,0);
+				drawBigPixel( (int) Math.floor(xEnd), (int) Math.floor(yEnd), 0,0,0);
+			}
+			else
+			{
+				drawBigPixel(x,y, MAX_INTENSITY);
+				drawBigPixel( (int) Math.floor(xEnd), (int) Math.floor(yEnd), MAX_INTENSITY);
+			}
 
-			while( y < Math.floor(yEnd) )
+			while( y < Math.floor(yEnd)-1 )
 			{
 				/*
 				 * Similar to above, only calculate these two values if we're drawing antialiased line.
@@ -466,11 +509,16 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 				}
 
 				y++;
+				boolean move = false;
 				if( p < 0 ) p += twoDx;
 				else
 				{
-					if( delX > 0 ) x++;
+					if( delX > 0 ) 
+					{
+						x++;
+					}
 					else x--;
+					move = true;
 					p += twoDxMinusDy;
 				}
 
@@ -484,14 +532,19 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 						/*
 						 * We consider between the pixel up or pixel up & right
 						 */
-						if(dUpper != dLower)
+						if(move && dUpper != dLower)
 						{
-							drawBigPixel(x+1,y, r + dUpper*(r + offSet), g + dUpper*(g + offSet), b + dUpper*(b + offSet));
-							drawBigPixel(x,y, r + dLower*(r + offSet), g + dLower*(g + offSet), b + dLower*(b + offSet));
+							drawBigPixel(x+1,y, dUpper, dUpper, dUpper);
+							drawBigPixel(x,y, dLower, dLower, dLower);
+						}
+						else if(!move && dUpper != dLower)
+						{
+							drawBigPixel(x-1,y, dUpper, dUpper, dUpper);
+							drawBigPixel(x,y, dLower, dLower, dLower);
 						}
 						else
 						{
-							drawBigPixel(x,y, r, g , b);
+							drawBigPixel(x,y, 0d, 0d , 0d);
 						}
 					}
 					else 
@@ -501,12 +554,17 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 						 */
 						if(dUpper != dLower)
 						{
-							drawBigPixel(x-1,y, r + dUpper*(r + offSet), g + dUpper*(g + offSet), b + dUpper*(b + offSet));
-							drawBigPixel(x,y, r + dLower*(r + offSet), g + dLower*(g + offSet), b + dLower*(b + offSet));
+							drawBigPixel(x-1,y, dUpper, dUpper, dUpper);
+							drawBigPixel(x,y, dLower, dLower, dLower);
+						}
+						else if(!move && dUpper != dLower)
+						{
+							drawBigPixel(x+1,y, dUpper, dUpper, dUpper);
+							drawBigPixel(x,y, dLower, dLower, dLower);
 						}
 						else
 						{
-							drawBigPixel(x,y, r, g , b);
+							drawBigPixel(x,y, 0d, 0d , 0d);
 						}
 					}
 					//				System.out.println(dLower + " - " + dUpper);

@@ -592,14 +592,18 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 			double y0, double xEnd,
 			double yEnd) {
 
-		// calculate radius
+		/*
+		 * Calculate radius
+		 */
 		int radius = calculateDistance(x0,y0,xEnd,yEnd);
 
-		// draw circle at origin
-		// only need to draw a quarter of the circle
-		// The eight points are: 
-		// (-x,-y), (-x,y), (x,-y), (x,y), (y,x), (y,-x), (-y,x), (-y,-x)
-
+		
+		/* 
+		 * draw circle at origin
+		 * only need to draw a quarter of the circle
+		 * The eight points are: 
+		 * (-x,-y), (-x,y), (x,-y), (x,y), (y,x), (y,-x), (-y,x), (-y,-x)
+		 */
 		int pK = (int) (1 - radius);
 
 		int x = -1;

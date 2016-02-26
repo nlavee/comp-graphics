@@ -13,14 +13,14 @@ e.g.:
 e.g.:   
 ![Circle Drawing Algorithm](img/CircleDrawingAlgorithmExample.png)  
 
-* **Antialiased Line Drawing** (*key: "a"*)  -- (*Disabled color*)
+* **Antialiased Line Drawing** (*key: "a"*)  -- (*Disabled color*)  
 e.g.:  
 ![Antialiased Line Drawing](img/AntialiasedLineDrawing.png)
   
 ## Extra learning things:
-* **Generate Image from Saved File** (*key: "p" or "m" or "z"*)
-I took some images online, ran it through a script I adapted from the Internet in order to get RGB values out of each pixels. These are saved into text files, which act as save file. When invoked using the specific keys above, the text files are read and the images are rendered based on information from the saved file.
-e.g.:
+* **Generate Image from Saved File** (*key: "p" or "m" or "z"*)  
+I took some images online, ran it through a script I adapted from the Internet in order to get RGB values out of each pixels. These are saved into text files, which act as save file. When invoked using the specific keys above, the text files are read and the images are rendered based on information from the saved file.  
+e.g.:  
 	* Pikachu (original & generated)    
 ![Pikachu](img/pikachu.png)
 ![Pikachu Generated](img/pikachuGenerated.png)  

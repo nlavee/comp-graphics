@@ -74,9 +74,6 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 	// globals on what mode we're in
 	public int activeMode = 2;
 
-	// globals to know whether we're dealing with first or second point
-	public boolean firstPoint = true;
-
 	// globals for color of the chosen big pixel
 	private float r = 0;
 	private float g = 0;
@@ -208,43 +205,40 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 		// clicked as the coordinates of the bigpixel to be drawn.
 		drawBigPixel((int)bigpixelxFirst,(int)bigpixelyFirst, MAX_INTENSITY);
 
-		if(!firstPoint)
-		{
-			drawBigPixel((int)bigpixelxSecond,(int)bigpixelySecond, MAX_INTENSITY);
+		drawBigPixel((int)bigpixelxSecond,(int)bigpixelySecond, MAX_INTENSITY);
 
-			// draw based on active mode
-			if(activeMode == 1) 
-			{
-				// circular mode
-				drawCircularMode(bigpixelxFirst, bigpixelyFirst, bigpixelxSecond, bigpixelySecond);
-			}
-			else if(activeMode == 2)
-			{
-				// regular line mode
-				//				drawRegularLine(bigpixelxFirst, bigpixelyFirst, bigpixelxSecond, bigpixelySecond);
-				drawLine(bigpixelxFirst, bigpixelyFirst, bigpixelxSecond, bigpixelySecond, false);
-			}
-			else if(activeMode == 3)
-			{
-				// antialiased mode
-				drawLine(bigpixelxFirst, bigpixelyFirst, bigpixelxSecond, bigpixelySecond, true);
-			}
-			else if(activeMode == 4)
-			{
-				drawPixelArt(1);
-			}
-			else if(activeMode == 5)
-			{
-				drawPixelArt(2);
-			}
-			else if(activeMode == 6)
-			{
-				drawPixelArt(3);
-			}
-			else
-			{
-				//System.out.println("No mode of drawing specified.");
-			}
+		// draw based on active mode
+		if(activeMode == 1) 
+		{
+			// circular mode
+			drawCircularMode(bigpixelxFirst, bigpixelyFirst, bigpixelxSecond, bigpixelySecond);
+		}
+		else if(activeMode == 2)
+		{
+			// regular line mode
+			//				drawRegularLine(bigpixelxFirst, bigpixelyFirst, bigpixelxSecond, bigpixelySecond);
+			drawLine(bigpixelxFirst, bigpixelyFirst, bigpixelxSecond, bigpixelySecond, false);
+		}
+		else if(activeMode == 3)
+		{
+			// antialiased mode
+			drawLine(bigpixelxFirst, bigpixelyFirst, bigpixelxSecond, bigpixelySecond, true);
+		}
+		else if(activeMode == 4)
+		{
+			drawPixelArt(1);
+		}
+		else if(activeMode == 5)
+		{
+			drawPixelArt(2);
+		}
+		else if(activeMode == 6)
+		{
+			drawPixelArt(3);
+		}
+		else
+		{
+			//System.out.println("No mode of drawing specified.");
 		}
 
 		/* force any buffered calls to actually be executed */
@@ -276,8 +270,8 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 		 * These are values for actual change in x and y
 		 * So we would know whether we should increment or decrement as we increase in step.
 		 */
-		int delX = (int) (Math.ceil(xEnd) - Math.ceil(x0));
-		int delY = (int) (Math.ceil(yEnd) - Math.ceil(y0));
+		int delX = (int) (Math.floor(xEnd) - Math.floor(x0));
+		int delY = (int) (Math.floor(yEnd) - Math.floor(y0));
 
 		/*
 		 * Calculate the absolute value for calculation of p
@@ -352,7 +346,7 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 				double dUpper = -1;
 				if(antialiased)
 				{
-					dLower = Math.abs(( (double) p / dx + 1) / 2);
+					dLower = ( (double) p / dx + 1) / 2;
 					dUpper = 1 - dLower;
 				}
 
@@ -552,7 +546,7 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 						/*
 						 * We consider between the pixel up or pixel up & left
 						 */
-						if(dUpper != dLower)
+						if(move && dUpper != dLower)
 						{
 							drawBigPixel(x-1,y, dUpper, dUpper, dUpper);
 							drawBigPixel(x,y, dLower, dLower, dLower);
@@ -597,7 +591,7 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 		 */
 		int radius = calculateDistance(x0,y0,xEnd,yEnd);
 
-		
+
 		/* 
 		 * draw circle at origin
 		 * only need to draw a quarter of the circle
@@ -896,7 +890,6 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 			bigpixelyFirst = 0;
 			bigpixelxSecond = 0;
 			bigpixelySecond = 0;
-			firstPoint = true;
 			activeMode = 0;
 			break;
 		case 'c':
@@ -1026,7 +1019,6 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 				bigpixelxFirst = 0;
 			if (bigpixelyFirst < 0)
 				bigpixelyFirst = 0;
-			firstPoint = false;
 		}
 		else if(button == MouseEvent.BUTTON3)
 		{

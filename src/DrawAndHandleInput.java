@@ -203,9 +203,8 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 
 		// uses the global double variables that were set when user
 		// clicked as the coordinates of the bigpixel to be drawn.
-		drawBigPixel((int)bigpixelxFirst,(int)bigpixelyFirst, MAX_INTENSITY);
-
-		drawBigPixel((int)bigpixelxSecond,(int)bigpixelySecond, MAX_INTENSITY);
+		drawBigPixel((int)bigpixelxFirst,(int)bigpixelyFirst);
+		drawBigPixel((int)bigpixelxSecond,(int)bigpixelySecond);
 
 		// draw based on active mode
 		if(activeMode == 1) 
@@ -312,8 +311,8 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 				y = (int) y0;
 			}
 
-			/*
-			 * if antialiased line, we will only allow black color line for now.
+			/* We draw the two end points here.
+			 * If antialiased line, we will only allow black color line for now.
 			 * Else, we draw with color.
 			 */
 			if(antialiased)
@@ -323,8 +322,8 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 			}
 			else
 			{
-				drawBigPixel(x,y, MAX_INTENSITY);
-				drawBigPixel( (int) Math.floor(xEnd), (int) Math.floor(yEnd), MAX_INTENSITY);
+				drawBigPixel(x,y);
+				drawBigPixel( (int) Math.floor(xEnd), (int) Math.floor(yEnd));
 			}
 
 			while( x < Math.floor(xEnd)-1 )
@@ -344,6 +343,7 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 				 */
 				double dLower = -1;
 				double dUpper = -1;
+
 				if(antialiased)
 				{
 					dLower = ( (double) p / dx + 1) / 2;
@@ -379,62 +379,92 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 				if(antialiased)
 				{
 					/*
-					 * For positive slope
+					 * Check through the 3 cases.
+					 * In the case where either is 1.0, we check it when
+					 * dLower & dUpper > 0
 					 */
-					if( delY > 0 )
+					if(dLower < 0)
 					{
-						/*
-						 * the line passes through unequal amount for two pixels.
-						 * Whichever pixel has higher percentage (dUpper vs. dLower),
-						 * we give it more.
-						 */
-						if(move && dLower != dUpper)
+						if( delY > 0)
 						{
-							System.out.println("(x,y-1) : " + x + ", " + (y-1) + " - " + dUpper);
-							System.out.println("(x,y) : " + x + ", " + y + " - " + dLower);
-							System.out.println();
-							drawBigPixel(x,y-1, dUpper, dUpper, dUpper); 
-							drawBigPixel(x,y, dLower, dLower, dLower);
-						}
-						/*
-						 * If the line passes through the center, we are just 
-						 * going to draw the chosen point
-						 */
-						else if(!move && dLower != dUpper)
-						{
-							System.out.println("(x,y+1) : " + x + ", " + (y+1) + " - " + dUpper);
-							System.out.println("(x,y) : " + x + ", " + y + " - " + dLower);
-							System.out.println();
-							drawBigPixel(x,y+1, dUpper, dUpper, dUpper); 
-							drawBigPixel(x,y, dLower, dLower, dLower);
+							drawBigPixel(x,y-1, 1- Math.abs(dLower), 1- Math.abs(dLower), 1- Math.abs(dLower)); 
+							drawBigPixel(x,y, Math.abs(dLower), Math.abs(dLower), Math.abs(dLower));
 						}
 						else
 						{
-							System.out.println("Center (x,y) : " + x + ", " + y);
-							System.out.println();
-							drawBigPixel(x,y,0d,0d,0d);
+							drawBigPixel(x,y+1, 1- Math.abs(dLower), 1- Math.abs(dLower), 1- Math.abs(dLower)); 
+							drawBigPixel(x,y, Math.abs(dLower), Math.abs(dLower), Math.abs(dLower));
 						}
 					}
-					/*
-					 * For negative slope, we consider between pixel to the right 
-					 * or pixel right & below.
-					 * Instead of y + 1 as above, we draw y - 1 
-					 */
-					else 
+					else if(dUpper < 0)
 					{
-						if(move && dUpper != dLower)
+						if( delY > 0)
 						{
-							drawBigPixel(x,y+1, dUpper, dUpper, dUpper); 
-							drawBigPixel(x,y, dLower, dLower, dLower);
-						}
-						else if(!move && dUpper != dLower)
-						{
-							drawBigPixel(x,y-1, dUpper, dUpper, dUpper); 
-							drawBigPixel(x,y, dLower, dLower, dLower);
+							drawBigPixel(x,y+1, Math.abs(dUpper), Math.abs(dUpper), Math.abs(dUpper)); 
+							drawBigPixel(x,y, 1-Math.abs(dUpper), 1-Math.abs(dUpper), 1-Math.abs(dUpper));
 						}
 						else
 						{
+							drawBigPixel(x,y-1, Math.abs(dUpper), Math.abs(dUpper), Math.abs(dUpper)); 
+							drawBigPixel(x,y, 1-Math.abs(dUpper), 1-Math.abs(dUpper), 1-Math.abs(dUpper));
+						}
+					}
+					else if(dLower >= 0 && dUpper >= 0)
+					{
+						/*
+						 * We go through the center of the pixel if either one of the values
+						 * are 1.0.
+						 */
+						if( dLower == 1.0 || dUpper == 1.0)
+						{
 							drawBigPixel(x,y, 0d, 0d, 0d);
+						}
+						/*
+						 * For positive slope
+						 */
+						else if( delY > 0 )
+						{
+							/*
+							 * Either when either dLower or dUpper = 0.5.
+							 * or when Bresenham's line chose to change y.
+							 */
+							if(move || dLower == dUpper)
+							{
+								//								System.out.println("(x,y-1) : " + x + ", " + (y-1) + " - " + dUpper);
+								//								System.out.println("(x,y) : " + x + ", " + y + " - " + dLower);
+								//								System.out.println();
+								drawBigPixel(x,y-1, dUpper, dUpper, dUpper); 
+								drawBigPixel(x,y, dLower, dLower, dLower);
+							}
+							/*
+							 * When Bresenham's line chose to keep y.
+							 */
+							else
+							{
+								//								System.out.println("(x,y+1) : " + x + ", " + (y+1) + " - " + dUpper);
+								//								System.out.println("(x,y) : " + x + ", " + y + " - " + dLower);
+								//								System.out.println();
+								drawBigPixel(x,y+1, dUpper, dUpper, dUpper); 
+								drawBigPixel(x,y, dLower, dLower, dLower);
+							}
+						}
+						/*
+						 * For negative slope, we consider between pixel to the right 
+						 * or pixel right & below.
+						 * Instead of y + 1 as above, we draw y - 1 
+						 */
+						else 
+						{
+							if(move || dUpper == dLower)
+							{
+								drawBigPixel(x,y+1, dUpper, dUpper, dUpper); 
+								drawBigPixel(x,y, dLower, dLower, dLower);
+							}
+							else 
+							{
+								drawBigPixel(x,y-1, dUpper, dUpper, dUpper); 
+								drawBigPixel(x,y, dLower, dLower, dLower);
+							}
 						}
 					}
 				}
@@ -443,7 +473,7 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 				 */
 				else
 				{
-					drawBigPixel(x,y, MAX_INTENSITY);
+					drawBigPixel(x,y);
 				}
 			}
 		}
@@ -484,8 +514,8 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 			}
 			else
 			{
-				drawBigPixel(x,y, MAX_INTENSITY);
-				drawBigPixel( (int) Math.floor(xEnd), (int) Math.floor(yEnd), MAX_INTENSITY);
+				drawBigPixel(x,y);
+				drawBigPixel( (int) Math.floor(xEnd), (int) Math.floor(yEnd));
 			}
 
 			while( y < Math.floor(yEnd)-1 )
@@ -496,11 +526,14 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 				 */
 				double dLower = -1;
 				double dUpper = -1;
+
 				if(antialiased)
 				{
 					dLower = ( (double) p / dy + 1) / 2;
 					dUpper = 1 - dLower;
 				}
+
+				System.out.println(dLower + " - " + dUpper);
 
 				y++;
 				boolean move = false;
@@ -521,54 +554,79 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 				 */
 				if(antialiased)
 				{
-					if( delX > 0 ) 
+					if( dLower < 0)
 					{
-						/*
-						 * We consider between the pixel up or pixel up & right
-						 */
-						if(move && dUpper != dLower)
+						if( delX > 0)
 						{
-							drawBigPixel(x+1,y, dUpper, dUpper, dUpper);
-							drawBigPixel(x,y, dLower, dLower, dLower);
-						}
-						else if(!move && dUpper != dLower)
-						{
-							drawBigPixel(x-1,y, dUpper, dUpper, dUpper);
-							drawBigPixel(x,y, dLower, dLower, dLower);
+							drawBigPixel(x-1,y, 1- Math.abs(dLower), 1- Math.abs(dLower), 1- Math.abs(dLower)); 
+							drawBigPixel(x,y, Math.abs(dLower), Math.abs(dLower), Math.abs(dLower));
 						}
 						else
 						{
-							drawBigPixel(x,y, 0d, 0d , 0d);
+							drawBigPixel(x+1,y, 1- Math.abs(dLower), 1- Math.abs(dLower), 1- Math.abs(dLower)); 
+							drawBigPixel(x,y, Math.abs(dLower), Math.abs(dLower), Math.abs(dLower));
 						}
 					}
-					else 
+					else if( dUpper < 0)
 					{
-						/*
-						 * We consider between the pixel up or pixel up & left
-						 */
-						if(move && dUpper != dLower)
+						if( delX > 0)
 						{
-							drawBigPixel(x-1,y, dUpper, dUpper, dUpper);
-							drawBigPixel(x,y, dLower, dLower, dLower);
-						}
-						else if(!move && dUpper != dLower)
-						{
-							drawBigPixel(x+1,y, dUpper, dUpper, dUpper);
-							drawBigPixel(x,y, dLower, dLower, dLower);
+							drawBigPixel(x+1,y, Math.abs(dUpper), Math.abs(dUpper), Math.abs(dUpper)); 
+							drawBigPixel(x,y, 1-Math.abs(dUpper), 1-Math.abs(dUpper), 1-Math.abs(dUpper));
 						}
 						else
 						{
-							drawBigPixel(x,y, 0d, 0d , 0d);
+							drawBigPixel(x-1,y, Math.abs(dUpper), Math.abs(dUpper), Math.abs(dUpper)); 
+							drawBigPixel(x,y, 1-Math.abs(dUpper), 1-Math.abs(dUpper), 1-Math.abs(dUpper));
 						}
 					}
-					//				System.out.println(dLower + " - " + dUpper);
+					else if(dLower >= 0 && dUpper >= 0)
+					{
+						if( dLower == 1.0 || dUpper == 1.0)
+						{
+							System.out.println("Full intensity");
+							drawBigPixel(x,y, 0d, 0d, 0d);
+						}
+						else if( delX > 0 ) 
+						{
+							/*
+							 * We consider between the pixel up or pixel up & right
+							 */
+							if(move || dUpper == dLower)
+							{
+								drawBigPixel(x-1,y, dUpper, dUpper, dUpper);
+								drawBigPixel(x,y, dLower, dLower, dLower);
+							}
+							else 
+							{
+								drawBigPixel(x+1,y, dUpper, dUpper, dUpper);
+								drawBigPixel(x,y, dLower, dLower, dLower);
+							}
+						}
+						else 
+						{
+							/*
+							 * We consider between the pixel up or pixel up & left
+							 */
+							if(move || dUpper == dLower)
+							{
+								drawBigPixel(x+1,y, dUpper, dUpper, dUpper);
+								drawBigPixel(x,y, dLower, dLower, dLower);
+							}
+							else //if(!move && dUpper != dLower)
+							{
+								drawBigPixel(x-1,y, dUpper, dUpper, dUpper);
+								drawBigPixel(x,y, dLower, dLower, dLower);
+							}
+						}
+					}
 				}
 				/*
 				 * Drawing aliased line
 				 */
 				else
 				{
-					drawBigPixel(x,y, MAX_INTENSITY);
+					drawBigPixel(x,y);
 				}
 			}
 
@@ -633,35 +691,35 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 			 */
 			if( Math.abs(x + x0) < widthLimit && x + x0 > 0  && y + y0 > 0 && Math.abs(y + y0) < heightLimit) 
 			{
-				drawBigPixel( (int) (x + x0), (int) (y + y0), MAX_INTENSITY );
+				drawBigPixel( (int) (x + x0), (int) (y + y0) );
 			}
 			if( Math.abs(negX + x0) < widthLimit && negX + x0 > 0  && negY + y0 > 0 && Math.abs(negY + y0) < heightLimit) 
 			{
-				drawBigPixel( (int) (negX + x0), (int) (negY + y0), MAX_INTENSITY );
+				drawBigPixel( (int) (negX + x0), (int) (negY + y0) );
 			}
 			if( Math.abs(negX + x0) < widthLimit && negX + x0 > 0  && y + y0 > 0 && Math.abs(y + y0) < heightLimit) 
 			{
-				drawBigPixel( (int) (negX + x0), (int) (y + y0), MAX_INTENSITY );
+				drawBigPixel( (int) (negX + x0), (int) (y + y0) );
 			}
 			if( Math.abs(x + x0) < widthLimit && x + x0 > 0  && negY + y0 > 0 && Math.abs(negY + y0) < heightLimit) 
 			{
-				drawBigPixel( (int) (x + x0), (int) (negY + y0), MAX_INTENSITY );
+				drawBigPixel( (int) (x + x0), (int) (negY + y0) );
 			}
 			if( Math.abs(y + x0) < widthLimit && y + x0 > 0  && x + y0 > 0 && Math.abs(x + y0) < heightLimit) 
 			{
-				drawBigPixel( (int) (y + x0), (int) (x + y0), MAX_INTENSITY );
+				drawBigPixel( (int) (y + x0), (int) (x + y0) );
 			}
 			if( Math.abs(y + x0) < widthLimit && y + x0 > 0  && negX + y0 > 0 && Math.abs(negX + y0) < heightLimit) 
 			{
-				drawBigPixel( (int) (y + x0), (int) (negX + y0), MAX_INTENSITY );
+				drawBigPixel( (int) (y + x0), (int) (negX + y0) );
 			}
 			if( Math.abs(negY + x0) < widthLimit && negY + x0 > 0  && x + y0 > 0 && Math.abs(x + y0) < heightLimit) 
 			{
-				drawBigPixel( (int) (negY + x0), (int) (x + y0), MAX_INTENSITY );
+				drawBigPixel( (int) (negY + x0), (int) (x + y0) );
 			}
 			if( Math.abs(negY + x0) < widthLimit && negY + x0 > 0  && negX + y0 > 0 && Math.abs(negX + y0) < heightLimit) 
 			{
-				drawBigPixel( (int) (negY + x0), (int) (negX + y0), MAX_INTENSITY );
+				drawBigPixel( (int) (negY + x0), (int) (negX + y0) );
 			}
 		}
 
@@ -767,7 +825,7 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 	    i - the value to times rgb value by
 
 	 */
-	public void drawBigPixel(int x, int y, double i)
+	public void drawBigPixel(int x, int y)
 	{
 		// because the y screen coordinates increase as we go down 
 		// and the y world coordinates increase as we go up
@@ -775,7 +833,7 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 		// of the big pixel if the big pixel coordinates' y values
 		// increased as we go up
 		int flip_y = Math.abs((BIGPIXEL_ROWS-1) - y);
-		gl.glColor3d(r * i, g * i, b * i);
+		gl.glColor3d(r, g, b);
 		gl.glBegin(GL2.GL_POLYGON);
 		gl.glVertex2d((double)x*BIGAREA_HEIGHT/BIGPIXEL_ROWS, 
 				(double)flip_y*BIGAREA_WIDTH/BIGPIXEL_COLS);

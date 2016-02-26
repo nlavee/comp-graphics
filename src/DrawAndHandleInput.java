@@ -433,8 +433,8 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 								//								System.out.println("(x,y-1) : " + x + ", " + (y-1) + " - " + dUpper);
 								//								System.out.println("(x,y) : " + x + ", " + y + " - " + dLower);
 								//								System.out.println();
-								drawBigPixel(x,y-1, dUpper, dUpper, dUpper); 
-								drawBigPixel(x,y, dLower, dLower, dLower);
+								drawBigPixel(x,y-1, 1-dUpper, 1-dUpper, 1-dUpper); 
+								drawBigPixel(x,y, 1-dLower, 1-dLower, 1-dLower);
 							}
 							/*
 							 * When Bresenham's line chose to keep y.
@@ -457,8 +457,8 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 						{
 							if(move || dUpper == dLower)
 							{
-								drawBigPixel(x,y+1, dUpper, dUpper, dUpper); 
-								drawBigPixel(x,y, dLower, dLower, dLower);
+								drawBigPixel(x,y+1, 1-dUpper, 1-dUpper, 1-dUpper); 
+								drawBigPixel(x,y, 1-dLower, 1-dLower, 1-dLower);
 							}
 							else 
 							{
@@ -540,10 +540,7 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 				if( p < 0 ) p += twoDx;
 				else
 				{
-					if( delX > 0 ) 
-					{
-						x++;
-					}
+					if( delX > 0 ) x++;
 					else x--;
 					move = true;
 					p += twoDxMinusDy;
@@ -584,7 +581,6 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 					{
 						if( dLower == 1.0 || dUpper == 1.0)
 						{
-							System.out.println("Full intensity");
 							drawBigPixel(x,y, 0d, 0d, 0d);
 						}
 						else if( delX > 0 ) 
@@ -594,8 +590,8 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 							 */
 							if(move || dUpper == dLower)
 							{
-								drawBigPixel(x-1,y, dUpper, dUpper, dUpper);
-								drawBigPixel(x,y, dLower, dLower, dLower);
+								drawBigPixel(x-1,y, 1-dUpper, 1-dUpper, 1-dUpper);
+								drawBigPixel(x,y, 1-dLower, 1-dLower, 1-dLower);
 							}
 							else 
 							{
@@ -610,8 +606,8 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 							 */
 							if(move || dUpper == dLower)
 							{
-								drawBigPixel(x+1,y, dUpper, dUpper, dUpper);
-								drawBigPixel(x,y, dLower, dLower, dLower);
+								drawBigPixel(x+1,y, 1-dUpper, 1-dUpper, 1-dUpper);
+								drawBigPixel(x,y, 1-dLower, 1-dLower, 1-dLower);
 							}
 							else //if(!move && dUpper != dLower)
 							{

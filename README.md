@@ -5,15 +5,18 @@ This project contains base code from instructor that I built up from to achieve 
 
 ## Checklist for algorithms implemented:
 
-* **Bresenham's Line Algorithm** (*key: "l"*) -- (*Works with any pair of points*).  
+* **Bresenham's Line Algorithm** (*key: "l"*) -- (*Works with any pair of points*)  
 e.g.:  
-![Line Drawing Algorithm](img/BrensenhamLineAlgorithmExample.png)
-* **Circle Drawing Algorithm** (*key: "c"*)  
-e.g.:  
-![Circle Drawing Algorithm](img/CircleDrawingAlgorithmExample.png)
-* **Antialiased Line Drawing** (*key: "a"*)  
-e.g.:
+![Line Drawing Algorithm](img/BrensenhamLineAlgorithmExample.png)  
 
+* **Circle Drawing Algorithm** (*key: "c"*)  
+e.g.:   
+![Circle Drawing Algorithm](img/CircleDrawingAlgorithmExample.png)  
+
+* **Antialiased Line Drawing** (*key: "a"*)  -- (*Disabled color*)
+e.g.:  
+![Antialiased Line Drawing](img/AntialiasedLineDrawing.png)
+  
 ## Extra learning things:
 * **Generate Image from Saved File** (*key: "p" or "m" or "z"*)
 I took some images online, ran it through a script I adapted from the Internet in order to get RGB values out of each pixels. These are saved into text files, which act as save file. When invoked using the specific keys above, the text files are read and the images are rendered based on information from the saved file.

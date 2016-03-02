@@ -288,6 +288,7 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 		 */
 		if(dy < dx)
 		{
+			//			System.out.println("0.0 < |m| < 1.0");
 			/* 
 			 * Calculate the necessary components
 			 */
@@ -387,11 +388,13 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 					{
 						if( delY > 0)
 						{
+							//							System.out.println( " dLower < 0 ; delY > 0");
 							drawBigPixel(x,y-1, 1- Math.abs(dLower), 1- Math.abs(dLower), 1- Math.abs(dLower)); 
 							drawBigPixel(x,y, Math.abs(dLower), Math.abs(dLower), Math.abs(dLower));
 						}
 						else
 						{
+							//							System.out.println( " dLower < 0 ; delY < 0");
 							drawBigPixel(x,y+1, 1- Math.abs(dLower), 1- Math.abs(dLower), 1- Math.abs(dLower)); 
 							drawBigPixel(x,y, Math.abs(dLower), Math.abs(dLower), Math.abs(dLower));
 						}
@@ -400,13 +403,15 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 					{
 						if( delY > 0)
 						{
-							drawBigPixel(x,y+1, Math.abs(dUpper), Math.abs(dUpper), Math.abs(dUpper)); 
-							drawBigPixel(x,y, 1-Math.abs(dUpper), 1-Math.abs(dUpper), 1-Math.abs(dUpper));
+							//							System.out.println( " dUpper < 0 ; delY > 0");
+							drawBigPixel(x,y+1, 1-Math.abs(dUpper), 1-Math.abs(dUpper), 1-Math.abs(dUpper)); 
+							drawBigPixel(x,y, Math.abs(dUpper), Math.abs(dUpper), Math.abs(dUpper));
 						}
 						else
 						{
-							drawBigPixel(x,y-1, Math.abs(dUpper), Math.abs(dUpper), Math.abs(dUpper)); 
-							drawBigPixel(x,y, 1-Math.abs(dUpper), 1-Math.abs(dUpper), 1-Math.abs(dUpper));
+							//							System.out.println( " dUpper < 0 ; delY < 0");
+							drawBigPixel(x,y-1, 1-Math.abs(dUpper), 1-Math.abs(dUpper), 1-Math.abs(dUpper)); 
+							drawBigPixel(x,y, Math.abs(dUpper), Math.abs(dUpper), Math.abs(dUpper));
 						}
 					}
 					else if(dLower >= 0 && dUpper >= 0)
@@ -484,6 +489,7 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 		 */
 		else
 		{
+			//			System.out.println("|m| > 1.0");
 			int p = 2 * dx - dy;
 			int twoDx = 2 * dx;
 			int twoDxMinusDy = 2 * (dx - dy);
@@ -551,30 +557,34 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 				 */
 				if(antialiased)
 				{
-					if( dLower < 0)
+					if( dLower < 0 )
 					{
-						if( delX > 0)
+						if( delX > 0 )
 						{
+							//							System.out.println( " dLower < 0 ; delX > 0; y-axis");
 							drawBigPixel(x-1,y, 1- Math.abs(dLower), 1- Math.abs(dLower), 1- Math.abs(dLower)); 
 							drawBigPixel(x,y, Math.abs(dLower), Math.abs(dLower), Math.abs(dLower));
 						}
 						else
 						{
-							drawBigPixel(x+1,y, 1- Math.abs(dLower), 1- Math.abs(dLower), 1- Math.abs(dLower)); 
+							//							System.out.println( " dLower < 0 ; delX < 0; y-axis");
+							drawBigPixel(x+1,y, 1-Math.abs(dLower), 1-Math.abs(dLower), 1-Math.abs(dLower)); 
 							drawBigPixel(x,y, Math.abs(dLower), Math.abs(dLower), Math.abs(dLower));
 						}
 					}
-					else if( dUpper < 0)
+					else if( dUpper < 0 )
 					{
-						if( delX > 0)
+						if( delX > 0 )
 						{
-							drawBigPixel(x+1,y, Math.abs(dUpper), Math.abs(dUpper), Math.abs(dUpper)); 
-							drawBigPixel(x,y, 1-Math.abs(dUpper), 1-Math.abs(dUpper), 1-Math.abs(dUpper));
+							//							System.out.println( " dUpper < 0 ; delX > 0; y-axis");
+							drawBigPixel(x+1,y, 1-Math.abs(dUpper), 1-Math.abs(dUpper), 1-Math.abs(dUpper)); 
+							drawBigPixel(x,y, Math.abs(dUpper), Math.abs(dUpper), Math.abs(dUpper));
 						}
 						else
 						{
-							drawBigPixel(x-1,y, Math.abs(dUpper), Math.abs(dUpper), Math.abs(dUpper)); 
-							drawBigPixel(x,y, 1-Math.abs(dUpper), 1-Math.abs(dUpper), 1-Math.abs(dUpper));
+							//							System.out.println( " dUpper < 0 ; delX < 0; y-axis");
+							drawBigPixel(x-1,y, 1-Math.abs(dUpper), 1-Math.abs(dUpper), 1-Math.abs(dUpper)); 
+							drawBigPixel(x,y, Math.abs(dUpper), Math.abs(dUpper), Math.abs(dUpper));
 						}
 					}
 					else if(dLower >= 0 && dUpper >= 0)
@@ -590,11 +600,13 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 							 */
 							if(move || dUpper == dLower)
 							{
+								//								System.out.println("Case 1");
 								drawBigPixel(x-1,y, 1-dUpper, 1-dUpper, 1-dUpper);
 								drawBigPixel(x,y, 1-dLower, 1-dLower, 1-dLower);
 							}
 							else 
 							{
+								//								System.out.println("Case 2");
 								drawBigPixel(x+1,y, dUpper, dUpper, dUpper);
 								drawBigPixel(x,y, dLower, dLower, dLower);
 							}
@@ -606,11 +618,13 @@ public class DrawAndHandleInput implements GLEventListener, KeyListener, MouseLi
 							 */
 							if(move || dUpper == dLower)
 							{
+								//								System.out.println("Case 3");
 								drawBigPixel(x+1,y, 1-dUpper, 1-dUpper, 1-dUpper);
 								drawBigPixel(x,y, 1-dLower, 1-dLower, 1-dLower);
 							}
-							else //if(!move && dUpper != dLower)
+							else
 							{
+								//								System.out.println("Case 4");
 								drawBigPixel(x-1,y, dUpper, dUpper, dUpper);
 								drawBigPixel(x,y, dLower, dLower, dLower);
 							}

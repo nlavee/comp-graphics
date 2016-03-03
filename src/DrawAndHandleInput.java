@@ -9,6 +9,12 @@
   This class DrawAndHandleInput which in a GLEventListener as well as a KeyListener and MouseListener
   displays a grid of "big" pixels for student use to add code to draw Bresenham Lines, Circles, and
   do antialiasing.
+  
+  UPDATE:
+  
+  Author: Anh Vu Nguyen
+  Implemented Bresenham's Line Algorithm, Circle Drawing Algorithm, Antialiased line algorithm.
+  Also implemented another method for drawing based on saved files of pixel and its RGB values.
 
  */
 
